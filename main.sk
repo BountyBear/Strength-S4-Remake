@@ -25,8 +25,8 @@ on death of player:
 			if isMax(attacker) is false:
 				add 1 to {strength::%attacker's uuid%}
 				set {_m2} to getStrength(attacker)
-				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%)"
+				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%&4&l)"
 			else:
 				drop 1 of {-strength::bottle} at victim's location
 		set {_m1} to strengthMessage(victim)
-		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%)"
+		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)"
