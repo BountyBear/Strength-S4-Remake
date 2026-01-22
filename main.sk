@@ -6,8 +6,8 @@
 #-----------------------[Strength System]----------------------
 
 on load:
-	set {-strength::bottle} to nautlis shell named "&cStrength" with custom model data 12345
-	set {-strength::reroll} to book named "&aReroll" with lore "&aRandom Ultimate and Basic" with custome model data 12346
+	set {-strength::bottle} to nautilus shell named "&cStrength" with custom model data 12345
+	set {-strength::reroll} to book named "&aReroll" with lore "&aRandom Ultimate and Basic" with custom model data 12346
 
 on join:
 	if isAssigned({_p}) is false:
@@ -17,16 +17,16 @@ on join:
 		Assign({_w}, player)
 
 on death of player:
-	if getStrength(victim) > {-strength::minimum}:
+	if isMin(victim) is false:
 		remove 1 from {strength::%victim's uuid%}
-		if attacker is not a player:
-			drop 1 of {-strength::bottle} at victim's location
+		if attacker is not player:
+			drop 1 of {-strength::bottle} at victim
 		else:
 			if isMax(attacker) is false:
 				add 1 to {strength::%attacker's uuid%}
 				set {_m2} to getStrength(attacker)
-				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%&4&l)"
+				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%&4&l)" to victim
 			else:
-				drop 1 of {-strength::bottle} at victim's location
+				drop 1 of {-strength::bottle} at victim
 		set {_m1} to strengthMessage(victim)
-		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)"
+		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)" to attacker

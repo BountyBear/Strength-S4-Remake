@@ -3,7 +3,7 @@
 function Assign(t: text,p: player):
 	set {_uuid} to {_p}'s uuid
 	if {_t} is "strength" or "Strength":
-		set {strength::%{_uuid}%} to {-strength::default}
+		set {strength::%{_uuid}%} to {-strength.default}
 	if {_t} is "Weapon" or "weapon":
 		set {_random} to random number between 1 and 6
 		if {_random} is 1:
@@ -37,9 +37,16 @@ function isAssigned(p: player):: boolean:
 
 function isMax(p: player):: boolean:
 	set {_uuid} to {_p}'s uuid
-	set {_s} to {-strength::max}
+	set {_s} to {-strength.max}
 	remove 1 from {_s}
 	if {strength::%{_uuid}%} <= {_s}:
+		return false
+	else:
+		return true
+
+function isMin(p: player):: boolean:
+	set {_uuid} to {_p}'s uuid
+	if {strength::%{_uuid}%} > {-strength.min}:
 		return false
 	else:
 		return true
@@ -62,15 +69,15 @@ function weaponMessage(p: player):: string:
 
 function strengthMessage(p: player):: string:
 	set {_uuid} to {_p}'s uuid
-	if {strength::{_uuid}} => 0:
-		return "&a&l+%{strength::{_uuid}}%"
+	if {strength::%{_uuid}%} >= 0:
+		return "&a&l+%{strength::%{_uuid}%}%"
 	else:
-		return "&a&l-%{strength::{_uuid}}%"
+		return "&a&l-%{strength::%{_uuid}%}%"
 
 function getWeapon(p: player):: string:
 	set {_uuid} to {_p}'s uuid
-	return "%{weapon::{_uuid}}%"
+	return "%{weapon::%{_uuid}%}%"
 
 function getStrength(p: player):: string:
 	set {_uuid} to {_p}'s uuid
-	return "%{strength::{_uuid}}%"
+	return "%{strength::%{_uuid}%}%"

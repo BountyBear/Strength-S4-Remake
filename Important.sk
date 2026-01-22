@@ -32,7 +32,7 @@ command /strength [<text>] [<text>] [<text>] [<text>]:
 				else:
 					if arg-2 is "Strength":
 						if arg-3 is not set:
-							snd "Invalid Argument :/" to player
+							send "Invalid Argument :/" to player
 						else:
 							set {_p} to arg-3 parsed as player
 							set {_uuid} to {_p}'s uuid
@@ -45,7 +45,7 @@ command /strength [<text>] [<text>] [<text>] [<text>]:
 								send "&4&l%{_p}% ᴄᴜʀʀᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ᴀᴛ %strengthMessage({_p})%" to player
 					if arg-2 is "Weapon":
 						if arg-3 is not set:
-							snd "Invalid Argument :/" to player
+							send "Invalid Argument :/" to player
 						else:
 							set {_p} to arg-3 parsed as player
 							set {_uuid} to {_p}'s uuid
@@ -104,7 +104,7 @@ command /strength [<text>] [<text>] [<text>] [<text>]:
 								send "&cYou recieved %{_i}% reroll item from &a%player%" to {_p}
 
 
-on tab completion for "/strength" or "/strength:strengthsmp":
+on tab complete for "/strength" or "/strength:strengthsmp":
 	if player does not have permission "op":
 		set tab completions for position 1 to "Strength"  and "Weapon"
 	else:
@@ -115,8 +115,12 @@ on tab completion for "/strength" or "/strength:strengthsmp":
 			set tab completions for position 2 to all players
 		if tab arg-1 = "Set":
 			set tab completions for position 2 to "Strength" and "Weapon"
-			set tab completions for position 3 to all players
-			set tab completions for position 4 to -3,-2,-1,0,1,2,3,4,5
+			if tab arg-2 = "Strength":
+				set tab completions for position 3 to all players
+				set tab completions for position 4 to -3,-2,-1,0,1,2,3,4,5
+			if tab arg-2 = "Weapon":
+				set tab completions for position 3 to all players
+				set tab completions for position 4 to "Sword" and "Axe" and "Shield" and "Bow" and "Crossbow" and "Trident"
 		if tab arg-1 = "Item":
 			set tab completions for position 2 to "Strength" and "Reroll"
 			set tab completions for position 3 to all players
