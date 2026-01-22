@@ -1,0 +1,28 @@
+# Important Strength functions
+
+function Assign(t:text,p: player):
+	set {_uuid} to {_p}'s uuid
+	if {_t} is "strength" or "Strength":
+		set {-strength::%{_uuid}%} to {-strength::default}
+	if {_t} is "Weapon" or "weapon":
+		set {_random} to random number between 1 and 6
+		if {_random} is 1:
+			set {weapon::%{_uuid}%} to "Sword"
+		if {_random} is 2:
+			set {weapon::%{_uuid}%} to "Axe"
+		if {_random} is 3:
+			set {weapon::%{_uuid}%} to "Trident"
+		if {_random} is 4:
+			set {weapon::%{_uuid}%} to "Bow"
+		if {_random} is 5:
+			set {weapon::%{_uuid}%} to "Crossbow"
+		if {_random} is 6:
+			set {weapon::%{_uuid}%} to "Shield"
+		send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ᴡᴇᴀᴘᴏɴ ɪꜱ&c&l %{weapon::%{_uuid}%}%" to {_p}
+
+function isAssigned(p: player):: boolean:
+	set {_uuid} to {_p}'s uuid
+	if {strength::%{_uuid}%} is not set:
+		return false
+	if {weapon::%{_uuid}%} is not set:
+		return false
