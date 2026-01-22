@@ -1,0 +1,32 @@
+# Strength Smp S4 Remake
+# EvokerCord
+# Dev : BountyBear
+# Discord: that.bear_ / dont_ask_why2
+
+#-----------------------[Strength System]----------------------
+
+on load:
+	set {-strength::bottle} to nautlis shell named "&cStrength" with custom model data 12345
+	set {-strength::reroll} to book named "&aReroll" with lore "&aRandom Ultimate and Basic" with custome model data 12346
+
+on join:
+	if isAssigned({_p}) is false:
+		set {_s} to "Strength"
+		set {_w} to "Weapon"
+		Assign({_s}, player)
+		Assign({_w}, player)
+
+on death of player:
+	if getStrength(victim) > {-strength::minimum}:
+		remove 1 from {strength::%victim's uuid%}
+		if attacker is not a player:
+			drop 1 of {-strength::bottle} at victim's location
+		else:
+			if isMax(attacker) is false:
+				add 1 to {strength::%attacker's uuid%}
+				set {_m2} to getStrength(attacker)
+				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%)"
+			else:
+				drop 1 of {-strength::bottle} at victim's location
+		set {_m1} to strengthMessage(victim)
+		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%)"

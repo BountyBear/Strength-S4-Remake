@@ -1,0 +1,76 @@
+# Important Strength functions
+
+function Assign(t: text,p: player):
+	set {_uuid} to {_p}'s uuid
+	if {_t} is "strength" or "Strength":
+		set {strength::%{_uuid}%} to {-strength::default}
+	if {_t} is "Weapon" or "weapon":
+		set {_random} to random number between 1 and 6
+		if {_random} is 1:
+			set {weapon::%{_uuid}%} to "Sword"
+		if {_random} is 2:
+			set {weapon::%{_uuid}%} to "Axe"
+		if {_random} is 3:
+			set {weapon::%{_uuid}%} to "Trident"
+		if {_random} is 4:
+			set {weapon::%{_uuid}%} to "Bow"
+		if {_random} is 5:
+			set {weapon::%{_uuid}%} to "Crossbow"
+		if {_random} is 6:
+			set {weapon::%{_uuid}%} to "Shield"
+		send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ᴡᴇᴀᴘᴏɴ ɪꜱ %getWeapon({_p})%" to {_p}
+
+function isAssigned(p: player):: boolean:
+	set {_uuid} to {_p}'s uuid
+	if any:
+		{strength::%{_uuid}%} is not set
+		{weapon::%{_uuid}%} is not set
+	then:
+		return false
+	else:
+		if {weapon::%{_uuid}%} is not set:
+			return false
+		else if {strength::%{_uuid}%} is not set:
+			return false
+		else:
+			return true
+
+function isMax(p: player):: boolean:
+	set {_uuid} to {_p}'s uuid
+	set {_s} to {-strength::max}
+	remove 1 from {_s}
+	if {strength::%{_uuid}%} <= {_s}:
+		return false
+	else:
+		return true
+
+
+function weaponMessage(p: player):: string:
+	set {_uuid} to {_p}'s uuid
+	if {weapon::%{_uuid}%} is "Sword":
+		return "&4&lꜱᴡᴏʀᴅ"
+	if {weapon::%{_uuid}%} is "Axe":
+		return "&4&ᴀxᴇ"
+	if {weapon::%{_uuid}%} is "Bow":
+		return "&4&lʙᴏᴡ"
+	if {weapon::%{_uuid}%} is "Crossbow":
+		return "&4&lᴄʀᴏꜱꜱʙᴏᴡ"
+	if {weapon::%{_uuid}%} is "Trident":
+		return "&4&lᴛʀɪᴅᴇɴᴛ"
+	if {weapon::%{_uuid}%} is "Shield":
+		return "&4&lꜱʜɪᴇʟᴅ"
+
+function strengthMessage(p: player):: string:
+	set {_uuid} to {_p}'s uuid
+	if {strength::{_uuid}} => 0:
+		return "&a&l+%{strength::{_uuid}}%"
+	else:
+		return "&a&l-%{strength::{_uuid}}%"
+
+function getWeapon(p: player):: string:
+	set {_uuid} to {_p}'s uuid
+	return "%{weapon::{_uuid}}%"
+
+function getStrength(p: player):: string:
+	set {_uuid} to {_p}'s uuid
+	return "%{strength::{_uuid}}%"
