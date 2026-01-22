@@ -1,0 +1,10 @@
+# Strength Smp S4 Remake
+# EvokerCord
+# Dev : BountyBear
+# Discord: that.bear_ / dont_ask_why2
+
+#-----------------------[Strength System]----------------------
+
+on load:
+    set {-strength::bottle} to nautlis shell named "&cStrength" with lore "&4Right click to use" with custom model data 12345
+    set {-strength::reroll} to book named "&aReroll" with lore "&aRandom Ultimate and Basic" with custome model data 12346
