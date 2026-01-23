@@ -24,9 +24,35 @@ on death of player:
 		else:
 			if isMax(attacker) is false:
 				add 1 to {strength::%attacker's uuid%}
-				set {_m2} to getStrength(attacker)
-				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%&4&l)" to victim
+				set {_m2} to strengthMessage(attacker)
+				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%&4&l)" to attacker
 			else:
 				drop 1 of {-strength::bottle} at victim
 		set {_m1} to strengthMessage(victim)
-		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)" to attacker
+		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)" to victim
+
+# [------------Strength and Reroll------------------]
+
+on damage:
+	if {strength::%attacker's uuid%} > 0:
+		set {_d} to {strength::%attacker's uuid%}
+		add {_d} to damage
+
+on right click:
+	if getItem(player's held item) is "Strength":
+		set {_i} to player's held item
+		if isMax(player) is false:
+			add 1 to {strength::%player's uuid%}
+			set {_m1} to strengthMessage(player)
+			send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)" to player
+			play sound "entity.player.levelup" at player
+			remove 1 of {_i} from player's inventory
+		else:
+			send "&cYou are already at max strength (+5)" to player
+			play sound "block.note_block.bass" with volume 2 at player
+	if getItem(player's held item) is "Reroll":
+		set {_i} to player's held item
+		set {_w} to "Weapon"
+		Assign({_w}, player)
+		play sound "entity.player.levelup" at player
+		remove 1 of {_i} from player's inventory

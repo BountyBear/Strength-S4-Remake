@@ -67,12 +67,19 @@ function weaponMessage(p: player):: string:
 	if {weapon::%{_uuid}%} is "Shield":
 		return "&4&lꜱʜɪᴇʟᴅ"
 
+function getItem(i: item):: string:
+	if {_i}'s name contains "&cStrength":
+		return "Strength"
+	if {_i}'s name contains "&aReroll":
+		return "Reroll"
+
+
 function strengthMessage(p: player):: string:
 	set {_uuid} to {_p}'s uuid
 	if {strength::%{_uuid}%} >= 0:
 		return "&a&l+%{strength::%{_uuid}%}%"
 	else:
-		return "&a&l-%{strength::%{_uuid}%}%"
+		return "&c&l%{strength::%{_uuid}%}%"
 
 function getWeapon(p: player):: string:
 	set {_uuid} to {_p}'s uuid
@@ -81,3 +88,4 @@ function getWeapon(p: player):: string:
 function getStrength(p: player):: string:
 	set {_uuid} to {_p}'s uuid
 	return "%{strength::%{_uuid}%}%"
+

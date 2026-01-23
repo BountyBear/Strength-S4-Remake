@@ -1,5 +1,8 @@
 # Some Imp stuff
 
+
+# [------------------Commands----------------------]
+
 command /strength [<text>] [<text>] [<text>] [<text>]:
 	aliases: /strength:strengthsmp
 	trigger:
@@ -125,3 +128,24 @@ on tab complete for "/strength" or "/strength:strengthsmp":
 			set tab completions for position 2 to "Strength" and "Reroll"
 			set tab completions for position 3 to all players
 			set tab completions for position 4 to 1,2,3,4,5,6,7,8,9
+
+
+# [----------------------Some Config stuff-------------------]
+
+
+on crafter craft:
+	if recipe result is mace:
+		cancel event
+
+on craft:
+	if event-item is mace:
+		if {-mace.allow} is false:
+			cancel event
+		else:
+			stop
+
+on damage:
+	if attacker's tool is mace:
+		if hit is critical:
+			victim is not blocking
+			set item cooldown of mace for attacker to {-mace.cooldown}
