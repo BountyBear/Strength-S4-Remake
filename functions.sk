@@ -89,3 +89,25 @@ function getStrength(p: player):: string:
 	set {_uuid} to {_p}'s uuid
 	return "%{strength::%{_uuid}%}%"
 
+function resetcooldown(p: player):
+	set {_uuid} to {_p}'s uuid
+	setCooldown("Sword::%{_uuid}%", 0, {_p})
+	setCooldown("Axe::%{_uuid}%", 0, {_p})
+	setCooldown("Bow::%{_uuid}%", 0, {_p})
+	setCooldown("Crossbow::%{_uuid}%", 0, {_p})
+	setCooldown("Shield::%{_uuid}%", 0, {_p})
+	setCooldown("Trident::%{_uuid}%", 0, {_p})
+
+every 2 seconds:
+	if doesCooldownExist("Sword::%uuid of loop-player%") is not true:
+		setCooldown("Sword::%{_uuid}%", 0, {_p})
+	if doesCooldownExist("Axe::%uuid of loop-player%") is not true:
+		setCooldown("Axe::%{_uuid}%", 0, {_p})
+	if doesCooldownExist("Bow::%uuid of loop-player%") is not true:
+		setCooldown("Bow::%{_uuid}%", 0, {_p})
+	if doesCooldownExist("Crossbow::%uuid of loop-player%") is not true:
+		setCooldown("Crossbow::%{_uuid}%", 0, {_p})
+	if doesCooldownExist("Trident::%uuid of loop-player%") is not true:
+		setCooldown("Trident::%{_uuid}%", 0, {_p})
+	if doesCooldownExist("Shield::%uuid of loop-player%") is not true:
+		setCooldown("Shiend::%{_uuid}%", 0, {_p})

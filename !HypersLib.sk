@@ -10,7 +10,7 @@
 #Change this to your plugin/script's name
 #If you change this after storing data with tags, they will no longer work
 options:
-	pluginname: hyperslib
+	pluginname: strength
 
 #Reminds the user to enable memory variables once they restart the server with the library for the first time and then later.
  

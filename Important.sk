@@ -3,6 +3,21 @@
 
 # [------------------Commands----------------------]
 
+command /cooldown [<text>]:
+	aliases: /strengthsmp:cooldown
+	permission: op
+	trigger:
+		if arg-1 is set:
+			set {_p} to arg-1 parsed as player
+			resetcooldown({_p})
+			send "&7Reset Cooldown for {_p}" to player
+		else:
+			resetcooldown(player)
+			send "&7Reset Cooldown for player" to player
+
+
+
+
 command /strength [<text>] [<text>] [<text>] [<text>]:
 	aliases: /strength:strengthsmp
 	trigger:
@@ -129,6 +144,9 @@ on tab complete for "/strength" or "/strength:strengthsmp":
 			set tab completions for position 3 to all players
 			set tab completions for position 4 to 1,2,3,4,5,6,7,8,9
 
+on tab complete for "/cooldown" or "/strengthsmp:cooldown":
+	player has permission "op"
+	set tab completions for position 1 to all players
 
 # [----------------------Some Config stuff-------------------]
 
