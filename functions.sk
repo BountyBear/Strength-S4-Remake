@@ -68,9 +68,9 @@ function weaponMessage(p: player):: string:
 		return "&4&lꜱʜɪᴇʟᴅ"
 
 function getItem(i: item):: string:
-	if {_i}'s name contains "&cStrength":
+	if {_i}'s lore contains "fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ɢᴀɪɴ &a+1 &fꜱᴛᴇʀɴɢᴛʜ":
 		return "Strength"
-	if {_i}'s name contains "&aReroll":
+	if {_i}'s lore contains "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴡᴇᴀᴘᴏɴ":
 		return "Reroll"
 
 

@@ -6,8 +6,8 @@
 #-----------------------[Strength System]----------------------
 
 on load:
-	set {-strength::bottle} to nautilus shell named "&cStrength" with custom model data 12345
-	set {-strength::reroll} to book named "&aReroll" with lore "&aRandom Ultimate and Basic" with custom model data 12346
+	set {-strength::bottle} to nautilus shell named "&4ꜱᴛʀᴇɴɢᴛʜ" with lore "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ɢᴀɪɴ &a+1 &fꜱᴛᴇʀɴɢᴛʜ" with custom model data 12345
+	set {-strength::reroll} to book named "&4ʀᴇʀᴏʟʟ ʙᴏᴏᴋ" with lore "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴡᴇᴀᴘᴏɴ" with custom model data 12346
 
 on join:
 	if isAssigned({_p}) is false:
