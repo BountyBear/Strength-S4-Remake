@@ -9,8 +9,6 @@
 
 #Change this to your plugin/script's name
 #If you change this after storing data with tags, they will no longer work
-options:
-	pluginname: strength
 
 #Reminds the user to enable memory variables once they restart the server with the library for the first time and then later.
  
@@ -34,14 +32,6 @@ import:
 	org.bukkit.persistence.PersistentDataContainer
 	org.bukkit.persistence.PersistentDataType
 	org.bukkit.event.block.Action
-
-	#NMS. We are using Mojang mappings, so, PaperMC is required.
-	#Entities
-	net.minecraft.world.entity.EntityType
-	net.minecraft.world.entity.monster.EnderMan
-	net.minecraft.world.entity.monster.Creeper
-	net.minecraft.world.entity.monster.CaveSpider
-	net.minecraft.world.entity.monster.Spider
 	#Packets
 	net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 	net.minecraft.network.protocol.game.ClientboundSetCameraPacket
@@ -56,7 +46,7 @@ import:
 	org.bukkit.entity.Mob
 
 on load:
-	set {-{@pluginname}::APIChange} to isAtAPIChange()
+	set {APIChange} to isAtAPIChange()
 
 #Checks if version is 1.20.4 or lower. At 1.20.5, Mojang has changed the NBT formatDouble and so has the server APIs. The change to the Bukkit API have been drastic.
 local function isAtAPIChange() :: boolean:
@@ -79,12 +69,12 @@ local function isAtAPIChange() :: boolean:
 
 condition server[(-| )version] is at [bukkit(-| )](API|api) change:
 	check:
-		{-{@pluginname}::APIChange} is true
+		{APIChange} is true
 		continue
 
 condition server[(-| )version] (is not|isn't) at [bukkit(-| )](API|api) change:
 	check:
-		{-{@pluginname}::APIChange} is false
+		{APIChange} is false
 		continue
 
 #Returns a random location out of a location within a radius.
@@ -132,29 +122,29 @@ condition cooldown %string% [for %player%] (positive:is ready|negative:is(n't| n
 
 #Gets the cooldown variable
 function getCooldown(cooldown: text) :: int:
-	return {-{@pluginname}::Cooldown::%{_cooldown}%}
+	return {-Cooldown::%{_cooldown}%}
 
 #Gets the cooldown's seconds, does not return the whole cooldown in seconds.
 function getCooldownSeconds(cooldown: text) :: int:
-	add Duration.ofMillis({-{@pluginname}::Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toSecondsPart() to {_coo}
+	add Duration.ofMillis({-Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toSecondsPart() to {_coo}
 	if {_coo} is 60:
 		set {_coo} to 0
 	return {_coo}
 
 #Gets the cooldown's minutes.
 function getCooldownMinutes(cooldown: text) :: int:
-	set {_coo} to Duration.ofMillis({-{@pluginname}::Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toMinutes()
-	if Duration.ofMillis({-{@pluginname}::Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toSecondsPart() is 60:
+	set {_coo} to Duration.ofMillis({-Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toMinutes()
+	if Duration.ofMillis({-Cooldown::%{_cooldown}%} - System.currentTimeMillis()).toSecondsPart() is 60:
 		add 1 to {_coo}
 	return {_coo}
 	
 #Sets the cooldown. 2nd argument (cooldown to be set) must be in milliseconds. Use toMilliseconds().
-function setCooldown(cooldown: text, value: number):
-	set {-{@pluginname}::Cooldown::%{_cooldown}%} to System.currentTimeMillis() + {_value}
+function setCooldown(cooldown: text, value: int):
+	set {-Cooldown::%{_cooldown}%} to System.currentTimeMillis() + {_value}
 
 #Checks if a cooldown exists, what else?
 function doesCooldownExist(cooldown: text) :: boolean:
-	if {-{@pluginname}::Cooldown::%{_cooldown}%} is set:
+	if {-Cooldown::%{_cooldown}%} is set:
 		return true
 	else:
 		return false
@@ -181,7 +171,7 @@ function toMilliseconds(minutes: int, seconds: int) :: int:
 #Returns cooldown in how it would look like in an action bar.
 function getActionBarCooldown(cooldow: text, show_decimal: boolean = false) :: text:
 	if isCooldownReady({_cooldow}) is true:
-		set {_cooldown} to "&aReady!"
+		set {_cooldown} to "&7&lReady!"
 	else:
 		if {_show_decimal} is false:
 			set {_cooldown_seconds} to getCooldownSeconds({_cooldow})
@@ -195,15 +185,15 @@ function getActionBarCooldown(cooldow: text, show_decimal: boolean = false) :: t
 		
 		if {_cooldown_minutes} > 0:
 			if {_cooldown_seconds} < 1:
-				set {_cooldown} to "&b%{_cooldown_minutes}%m"
+				set {_cooldown} to "&7&l%{_cooldown_minutes}%m"
 			else:
-				set {_cooldown} to "&b%{_cooldown_minutes}%m %{_cooldown_seconds}%s"
+				set {_cooldown} to "&7&l%{_cooldown_minutes}%m %{_cooldown_seconds}%s"
 		if {_cooldown_minutes} < 1:
 			if {_cooldown_seconds} > 0:
-				set {_cooldown} to "&b%{_cooldown_seconds}%s"
+				set {_cooldown} to "&7&l%{_cooldown_seconds}%s"
 
 		if {_cooldown} is not set:
-			set {_cooldown} to "&aReady!"
+			set {_cooldown} to "&7&lReady!"
 
 		if {_show_decimal} is true:
 			replace all "m" and "s" with "" in {_cooldown}
@@ -213,13 +203,13 @@ function getActionBarCooldown(cooldow: text, show_decimal: boolean = false) :: t
 
 #Makes the item unremovable from your inventory
 function addUnremovableItem(i: item, checkName: boolean = true, checkLore: boolean = true):
-	if {-{@pluginname}::UnremovableItems::*} is set:
-		set {_size} to size of {-{@pluginname}::UnremovableItems::*} + 1
+	if {UnremovableItems::*} is set:
+		set {_size} to size of {UnremovableItems::*} + 1
 	else:
 		set {_size} to 1
-	set {-{@pluginname}::UnremovableItems::%{_size}%} to {_i}
-	set {-{@pluginname}::UnremovableItems::checkNames::%{_size}%} to {_checkName}
-	set {-{@pluginname}::UnremovableItems::checkLore::%{_size}%} to {_checkLore}
+	set {UnremovableItems::%{_size}%} to {_i}
+	set {UnremovableItems::checkNames::%{_size}%} to {_checkName}
+	set {UnremovableItems::checkLore::%{_size}%} to {_checkLore}
 
 expression unremovable %itemtype%:
 	return type: item
@@ -230,13 +220,13 @@ expression unremovable %itemtype%:
 function isUnremovable(i: item) :: boolean:
 	if {_i} has boolean tag data "unremovable":
 		return true
-	loop {-{@pluginname}::UnremovableItems::*}:
+	loop {UnremovableItems::*}:
 		if loop-value is {_i}:
 			return true
-		if {-{@pluginname}::UnremovableItems::checkNames::%loop-iteration%} is true:
+		if {UnremovableItems::checkNames::%loop-iteration%} is true:
 			if name of loop-value is name of {_i}:
 				return true
-		if {-{@pluginname}::UnremovableItems::checkLore::%loop-iteration%} is true:
+		if {UnremovableItems::checkLore::%loop-iteration%} is true:
 			if lore of loop-value is lore of {_i}:
 				return true
 	return false
@@ -318,147 +308,12 @@ on PlayerInteractEvent:
 		isUnremovable(event.getPlayer()'s off hand item) is true
 		event.setCancelled(true)
 
-local function toSmallCaps(string: text) :: text:
-	set {_normalText::*} to "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y" and "Z" #!RAT was here, Added a Y, you dumbass hyper.
-	set {_smallText::*} to "ᴀ", "ʙ", "ᴄ", "ᴅ", "ᴇ", "ғ", "ɢ", "ʜ", "ɪ", "ᴊ", "ᴋ", "ʟ", "ᴍ", "ɴ", "ᴏ", "ᴘ", "ǫ", "ʀ", "s", "ᴛ", "ᴜ", "ᴠ", "ᴡ", "x", "ʏ" and "ᴢ"
-	set {_finalString} to ""
-	set {_skipAmount} to 0
-
-	set {_string} to raw {_string}
-	loop {_string}'s length times:
-		set {_index} to loop-iteration - 1
-		set {_char} to char at {_index} in {_string}
-		if {_skipAmount} > 0:
-			add {_char} to {_finalString}
-			remove 1 from {_skipAmount}
-			continue
-		loop {_normalText::*}:
-			if {_char} is "<":
-				set {_bracketIndex} to {_index}
-				while char at {_bracketIndex} in {_string} is not ">":
-					if {_bracketIndex} > {_string}'s length - 1:
-						exit 3 sections
-					add 1 to {_bracketIndex}
-					add 1 to {_skipAmount}
-			if {_char} is "&":
-				if {_string}'s length <= {_index} + 1:
-					exit 2 sections
-				char at {_index} + 1 in {_string} is not "&"
-				char at {_index} + 1 in {_string} is not " "
-				add 1 to {_skipAmount}
-
-			if Character.isLetter({_char}.toUpperCase()) is not true:
-				add {_char} to {_finalString}
-				exit 2 sections
-			if loop-value-2 is {_char}:
-				add {_smallText::%loop-iteration-2%} to {_finalString}
-	return colored {_finalString}
-	
-expression:
-	patterns:
-		small caps from %strings%
-		%strings% (as|to|in) small caps
-	get:
-		set {_strings::*} to expr-1
-		loop {_strings::*}:
-			add toSmallCaps(loop-value) to {_list::*}
-		return {_list::*}
-
 #All geyser/bedrock players have a uuid that start with 00000000-0000-0000-000
 #No Java player would be able to get this uuid, it's not a valid UUID that could be generated from Mojang.
-condition %player% is [a] (bedrock|geyser|floodgate) player:
-	check:
-		expr-1's uuid starts with "00000000"
-		continue
-condition %player% (is not|isn't) [a] (bedrock|geyser|floodgate) player:
-	check:
-		expr-1's uuid doesn't start with "00000000"
-		continue
 
 #We are using NMS here. Code from PoaSK.
 #Only supports enderman, creeper, spider, cave spider, and player (default for players, duh)
-effect:
-	patterns:
-		change vision of %players% to [entity] %entitytype%
-		change %players%'s vision to [entity] %entitytype%
-	parse:
-		#Create errors for unsupported entities
-		if any:
-			"%expr-2%" is "enderman"
-			"%expr-2%" is "creeper"
-			"%expr-2%" is "spider"
-			"%expr-2%" is "cave spider"
-			"%expr-2%" is "player"
-		then:
-			continue
-	trigger:
-		set {_players::*} to expr-1
-		loop {_players::*}:
-			setVision(loop-value, expr-2)
 
-local function setVision(player: player, entity: object):
-	set {_serverPlayer} to {_player}.getHandle()
-	set {_serverLevel} to {_player}.getWorld().getHandle()
-	
-	if "%{_entity}%" is "enderman":
-		set {_NMSEntity} to new EnderMan(EntityType.ENDERMAN, {_serverLevel})
-	else if "%{_entity}%" is "creeper":
-		set {_NMSEntity} to new Creeper(EntityType.CREEPER, {_serverLevel})
-	else if "%{_entity}%" is "spider":
-		set {_NMSEntity} to new Spider(EntityType.SPIDER, {_serverLevel})
-	else if any:
-		"%{_entity}%" is "cave_spider"
-		"%{_entity}%" is "cave spider"
-	then:
-		set {_NMSEntity} to new CaveSpider(EntityType.CAVE_SPIDER, {_serverLevel})
-	else if "%{_entity}%" is "player":
-		{_serverPlayer}.connection.send(new ClientboundSetCameraPacket({_serverPlayer}))
-		stop
-
-	{_serverPlayer}.connection.send(new ClientboundAddEntityPacket({_NMSEntity}, 0, BlockPos.ZERO))
-	{_serverPlayer}.connection.send(new ClientboundSetCameraPacket({_NMSEntity}))
-
-	refreshPlayer({_player})
-
-effect refresh %players%:
-	trigger:
-		set {_players::*} to expr-1
-		loop {_players::*}:
-			refreshPlayer(loop-value)
-
-local function refreshPlayer(player: player):
-	set {_serverPlayer} to {_player}.getHandle()
-	set {_serverLevel} to {_player}.getWorld().getHandle()
-
-	{_serverPlayer}.connection.send(new ClientboundRespawnPacket({_serverPlayer}.createCommonSpawnInfo({_serverLevel}), ClientboundRespawnPacket.KEEP_ALL_DATA))
-	{_serverPlayer}.connection.teleport({_player}.getLocation())
-
-	if ({_serverPlayer}.isPassenger()):
-		{_serverPlayer}.connection.send(new ClientboundSetPassengersPacket({_serverPlayer}.getVehicle()))
-
-	if ({_serverPlayer}.isVehicle()):
-		{_serverPlayer}.connection.send(new ClientboundSetPassengersPacket({_serverPlayer}))
-
-	set {_entities::*} to {_player}.getNearbyEntities(10, 10, 10)
-
-	loop {_entities::*}:
-		loop-value is an instance of Mob
-		set {_NMSMob} to loop-value.getHandle()
-		{_serverPlayer}.equals({_NMSMob}.getLeashHolder())
-		{_serverPlayer}.connection.send(new ClientboundSetEntityLinkPacket({_NMSMob}, {_serverPlayer}))
-
-	if {_serverPlayer}.getCooldowns().cooldowns.isEmpty() is not true:
-		set {_tickCount} to {_serverPlayer}.getCooldowns().tickCount
-		set {_cooldowns::*} to {_serverPlayer}.getCooldowns().cooldowns.entrySet()
-		loop {_cooldowns::*}:
-			{_serverPlayer}.connection.send(new ClientboundCooldownPacket(loop-value.getKey(), loop-value.getValue().endTime - {_tickCount}))
-
-	{_serverPlayer}.onUpdateAbilities()
-
-	#in 1.21.5, they made the server field private, this should not affect us here. As said here: https://tpgamesnl.gitbook.io/skript-reflect/code-conventions#:~:text=private%20members%20are%20visible%20and%20accessible%20by%20default.
-	{_serverPlayer}.server.getPlayerList().sendPlayerPermissionLevel({_serverPlayer})
-	{_serverPlayer}.server.getPlayerList().sendLevelInfo({_serverPlayer}, {_serverLevel})
-	{_serverPlayer}.server.getPlayerList().sendAllPlayerInfo({_serverPlayer})
 
 #Geometry
 function oppositeNumber(number: number) :: number:
@@ -495,9 +350,9 @@ item property %string% %nbttype% [custom] [nbt[ tag]] [data]:
 		set {_data} to expr-2
 
 		if server is not at api change:
-			set {_tag} to "PublicBukkitValues;{@pluginname}:%{_data}%"
+			set {_tag} to "PublicBukkitValues;Strength:%{_data}%"
 		else:
-			set {_tag} to "minecraft:custom_data;PublicBukkitValues;{@pluginname}:%{_data}%"
+			set {_tag} to "minecraft:custom_data;PublicBukkitValues;Strength:%{_data}%"
 		
 		set {_nbt} to expr-3 {_tag} of nbt of expr-1
 		return {_nbt}
@@ -510,22 +365,22 @@ condition %itemstack% has [string] [custom] [nbt[ tag]] data %string% [(as|[set]
 			set {_value} to expr-3
 		if {_value} is not set:
 			if server is not at api change:
-				nbt compound of expr-1 has tag "PublicBukkitValues;{@pluginname}:%{_name}%"
+				nbt compound of expr-1 has tag "PublicBukkitValues;Strength:%{_name}%"
 				continue
 			else:
-				nbt compound of expr-1 has tag "minecraft:custom_data;PublicBukkitValues;{@pluginname}:%{_name}%"
+				nbt compound of expr-1 has tag "minecraft:custom_data;PublicBukkitValues;Strength:%{_name}%"
 				continue
 		else:
 			if server is not at api change:
-				if nbt compound of expr-1 doesn't have tag "PublicBukkitValues;{@pluginname}:%{_name}%":
+				if nbt compound of expr-1 doesn't have tag "PublicBukkitValues;Strength:%{_name}%":
 					stop
 			else:
-				if nbt compound of expr-1 doesn't have tag "minecraft:custom_data;PublicBukkitValues;{@pluginname}:%{_name}%":
+				if nbt compound of expr-1 doesn't have tag "minecraft:custom_data;PublicBukkitValues;Strength:%{_name}%":
 					stop
 			if server is not at api change:
-				set {_tag} to "PublicBukkitValues;{@pluginname}:%{_name}%"
+				set {_tag} to "PublicBukkitValues;Strength:%{_name}%"
 			else:
-				set {_tag} to "minecraft:custom_data;PublicBukkitValues;{@pluginname}:%{_name}%"
+				set {_tag} to "minecraft:custom_data;PublicBukkitValues;Strength:%{_name}%"
 			string tag {_tag} of nbt compound of {_item} is {_value}
 			continue
 
@@ -588,9 +443,9 @@ expression %itemtype% with %nbttype% [custom] [nbt[ tag]] data %string% (as|to| 
 		set {_name} to expr-3
 		set {_value} to expr-4
 		if server is not at api change:
-			set expr-2 "PublicBukkitValues;{@pluginname}:%{_name}%" of nbt of {_item} to {_value}
+			set expr-2 "PublicBukkitValues;Strength:%{_name}%" of nbt of {_item} to {_value}
 		else:
-			set expr-2 "minecraft:custom_data;PublicBukkitValues;{@pluginname}:%{_name}%" of nbt of {_item} to {_value}
+			set expr-2 "minecraft:custom_data;PublicBukkitValues;Strength:%{_name}%" of nbt of {_item} to {_value}
 		return {_item}
 
 expression %itemtype% with [string] [custom] [nbt[ tag]] data %string% (as|to| set to) %string%:

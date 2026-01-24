@@ -1,4 +1,5 @@
 # Sterngth S4 Remake Config
+
 on load:
 	# Maximum Strength
 	set {-strength.max} to 5

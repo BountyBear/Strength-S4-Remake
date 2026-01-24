@@ -16,14 +16,17 @@ command /cooldown [<text>]:
 			send "&7Reset Cooldown for player" to player
 
 
-
+command /ability:
+	aliases: /strengthsmp:ability
+	trigger:
+		
 
 command /strength [<text>] [<text>] [<text>] [<text>]:
 	aliases: /strength:strengthsmp
 	trigger:
 		if arg-1 is not set:
-			send "&4&lʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ᴀᴛ %strengthMessage(player)%" to player
-			send "&4&lʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ᴡᴇᴀᴘᴏɴ ɪꜱ (%weaponMessage(player)%&4&l)" to player
+			send "&e&lStrength: %strengthMessage(player)%" to player
+			send "&e&lWeapon: %weaponMessage(player)%" to player
 		else:
 			if arg-1 is "Strength":
 				if arg-2 is not set:

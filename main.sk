@@ -56,3 +56,53 @@ on right click:
 		Assign({_w}, player)
 		play sound "entity.player.levelup" at player
 		remove 1 of {_i} from player's inventory
+
+# [------------Weapons---------------]
+
+on damage:
+	{-strength::sword::activated::%attacker's uuid%} or {-auto.crit::%attacker's uuid%} is set
+	set damage to damage * 1.5
+	play sound "entity.player.attack.crit" with volume 3 at attacker's location
+	draw 10 of crit at victim's location with offset vector(1.2,1.3,1.2) with extra 0.3
+
+on damage:
+	if getWeapon(victim) is "Sword":
+		{-strength::sword::activated::%victim's uuid%} or {-auto.crit::%victim's uuid%} is not set
+		{strength::%victim's uuid%} > -1
+		{-combo::%victim's uuid%} is not 6
+		delete {-combo::%victim's uuid%}
+
+on damage:
+	attacker is player
+	{strength::%attacker's uuid%} = 5
+	getWeapon(attacker) is "Sword"
+	cooldown "Sword" for attacker is ready
+	{-Ready::Sword::%attacker's uuid%} is not set
+	{-strength::sword::activated::%attacker's uuid%} is not set
+	if {-combo::%attacker's uuid%} is not 5:
+		add 1 to {-combo::%attacker's uuid%}
+	else:
+		send "&7&lReady" to attacker
+		play sound "entity.player.levelup" with pitch 2 at attacker
+		set {-Ready::Sword::%attacker's uuid%} to true
+		delete {-combo::%attacker's uuid%}
+	if {-combo::%attacker's uuid%} is not set:
+		set {-combo::%attacker's uuid%} to 0
+
+
+on damage:
+	if attacker is player:
+		{strength::%attacker's uuid%} > -1
+		{-strength::sword::activated::%attacker's uuid%} is not set
+		getWeapon(attacker) is "Sword"
+		{-combo::%attacker's uuid%} is not 6
+		{-auto.crit::%attacker's uuid%} is not set
+		if {-combo::%attacker's uuid%} is not set:
+			set {-combo::%attacker's uuid%} to 0
+		if {-combo::%attacker's uuid%} is not 3:
+			add 1 to {-combo::%attacker's uuid%}
+		else:
+			set {-combo::%attacker's uuid%} to 0
+			set {-auto.crit::%attacker's uuid%} to true
+			wait 5 seconds
+			delete {-auto.crit::%attacker's uuid%}
