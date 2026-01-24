@@ -10,11 +10,15 @@ on load:
 	set {-strength::reroll} to book named "&4ʀᴇʀᴏʟʟ ʙᴏᴏᴋ" with lore "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴡᴇᴀᴘᴏɴ" with custom model data 12346
 
 on join:
-	if isAssigned({_p}) is false:
+	if {strength::%player's uuid%} or {weapon::%player's uuid%} is not set:
 		set {_s} to "Strength"
 		set {_w} to "Weapon"
 		Assign({_s}, player)
 		Assign({_w}, player)
+	delete {-auto.crit::%player's uuid%}
+	delete {-combo::%player's uuid%}
+	delete {-Ready::%getWeapon(player)%::%player's uuid%}
+	delete {-strength::%getWeapon(player)%::activated::%player's uuid%}
 
 on death of player:
 	if isMin(victim) is false:
@@ -69,40 +73,100 @@ on damage:
 	if getWeapon(victim) is "Sword":
 		{-strength::sword::activated::%victim's uuid%} or {-auto.crit::%victim's uuid%} is not set
 		{strength::%victim's uuid%} > -1
-		{-combo::%victim's uuid%} is not 6
+		delete {-combo::%victim's uuid%}
+	if getWeapon(victim) is "Axe":
+		{-strength::axe::activated::%victim's uuid%} is not set
+		{strength::%victim's uuid%} > -1
 		delete {-combo::%victim's uuid%}
 
 on damage:
 	attacker is player
 	{strength::%attacker's uuid%} = 5
-	getWeapon(attacker) is "Sword"
-	cooldown "Sword" for attacker is ready
-	{-Ready::Sword::%attacker's uuid%} is not set
-	{-strength::sword::activated::%attacker's uuid%} is not set
-	if {-combo::%attacker's uuid%} is not 5:
-		add 1 to {-combo::%attacker's uuid%}
-	else:
-		send "&7&lReady" to attacker
-		play sound "entity.player.levelup" with pitch 2 at attacker
-		set {-Ready::Sword::%attacker's uuid%} to true
-		delete {-combo::%attacker's uuid%}
-	if {-combo::%attacker's uuid%} is not set:
-		set {-combo::%attacker's uuid%} to 0
-
+	if getWeapon(attacker) is "Sword":
+		hasWeapon(attacker) is true
+		cooldown "Sword" for attacker is ready
+		{-Ready::Sword::%attacker's uuid%} is not set
+		{-strength::sword::activated::%attacker's uuid%} is not set
+		if {-combo::%attacker's uuid%} is not 5:
+			add 1 to {-combo::%attacker's uuid%}
+		else:
+			send "&7&l⚔ Ready" to attacker
+			play sound "entity.player.levelup" with pitch 2 at attacker
+			set {-Ready::Sword::%attacker's uuid%} to true
+			delete {-combo::%attacker's uuid%}
+		if {-combo::%attacker's uuid%} is not set:
+			set {-combo::%attacker's uuid%} to 0
+	if getWeapon(attacker) is "Axe":
+		hasWeapon(attacker) is true
+		cooldown "Axe" for attacker is ready
+		{-Ready::Axe::%attacker's uuid%} is not set
+		{-strength::Axe::activated::%attacker's uuid%} is not set
+		if {-combo::%attacker's uuid%} is 7:
+			send "&7&l🪓 Ready" to attacker
+			play sound "entity.player.levelup" with pitch 2 at attacker
+			set {-Ready::Axe::%attacker's uuid%} to true
+			delete {-combo::%attacker's uuid%}
+		if {-combo::%attacker's uuid%} is not set:
+			set {-combo::%attacker's uuid%} to 0
+	if getWeapon(attacker) is "Trident":
+		hasWeapon(attacker) is true
+		cooldown "Trident" for attacker is ready
+		{-Ready::trident::%attacker's uuid%} is not set
+		{-strength::trident::activated::%attacker's uuid%} is not set
+		if {-combo::%attacker's uuid%} is not 5:
+			add 1 to {-combo::%attacker's uuid%}
+		else:
+			send "&b&l🔱 Ready" to attacker
+			play sound "entity.player.levelup" with pitch 2 at attacker
+			set {-Ready::trident::%attacker's uuid%} to true
+			delete {-combo::%attacker's uuid%}
+		if {-combo::%attacker's uuid%} is not set:
+			set {-combo::%attacker's uuid%} to 0
+		
+on damage:
+	if {-strength::axe::activated::%attacker's uuid%} is set:
+		if {-storeddmg::%victim's uuid%::%attacker's uuid%} is not set:
+			set {-storeddmg::%victim's uuid%::%attacker's uuid%} to damage
+			set damage to 0
+		else:
+			add damage to {-storeddmg::%victim's uuid%::%attacker's uuid%}
+			set damage to 0
 
 on damage:
 	if attacker is player:
 		{strength::%attacker's uuid%} > -1
-		{-strength::sword::activated::%attacker's uuid%} is not set
-		getWeapon(attacker) is "Sword"
-		{-combo::%attacker's uuid%} is not 6
-		{-auto.crit::%attacker's uuid%} is not set
-		if {-combo::%attacker's uuid%} is not set:
-			set {-combo::%attacker's uuid%} to 0
-		if {-combo::%attacker's uuid%} is not 3:
-			add 1 to {-combo::%attacker's uuid%}
-		else:
-			set {-combo::%attacker's uuid%} to 0
-			set {-auto.crit::%attacker's uuid%} to true
-			wait 5 seconds
-			delete {-auto.crit::%attacker's uuid%}
+		if getWeapon(attacker) is "Sword":
+			hasWeapon(attacker) is true
+			{-strength::sword::activated::%attacker's uuid%} is not set
+			{-auto.crit::%attacker's uuid%} is not set
+			if {-combo::%attacker's uuid%} is not set:
+				set {-combo::%attacker's uuid%} to 0
+			if {-combo::%attacker's uuid%} is not 3:
+				add 1 to {-combo::%attacker's uuid%}
+			else:
+				set {-combo::%attacker's uuid%} to 0
+				set {-auto.crit::%attacker's uuid%} to true
+				wait 5 seconds
+				delete {-auto.crit::%attacker's uuid%}
+		if getWeapon(attacker) is "Axe":
+			hasWeapon(attacker) is true
+			{-strength::axe::activated::%attacker's uuid%} is not set
+			if {-combo::%attacker's uuid%} is not set:
+				set {-combo::%attacker's uuid%} to 0
+			if {-combo::%attacker's uuid%} is not 5:
+				add 1 to {-combo::%attacker's uuid%}
+			else:
+				if {-Ready::Axe::%attacker's uuid%} is not set:
+					add 1 to {-combo::%attacker's uuid%}
+				else:
+					delete {-combo::%attacker's uuid%}
+				wait 10 ticks
+				Stun(victim, 1)
+				partCircle(victim,1,0)
+				partCircle(victim,1,1)
+				partCircle(victim,1,2)
+				play sound "entity.elder_guardian.curse" with pitch 2 at victim
+		if getWeapon(attacker) is "Trident":
+			hasWeapon(attacker) is true
+			{-strength::trident::activated::%attacker's uuid%} is not set
+			strike lightning at victim's location

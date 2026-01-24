@@ -20,20 +20,6 @@ function Assign(t: text,p: player):
 			set {weapon::%{_uuid}%} to "Shield"
 		send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ᴡᴇᴀᴘᴏɴ ɪꜱ %getWeapon({_p})%" to {_p}
 
-function isAssigned(p: player):: boolean:
-	set {_uuid} to {_p}'s uuid
-	if any:
-		{strength::%{_uuid}%} is not set
-		{weapon::%{_uuid}%} is not set
-	then:
-		return false
-	else:
-		if {weapon::%{_uuid}%} is not set:
-			return false
-		else if {strength::%{_uuid}%} is not set:
-			return false
-		else:
-			return true
 
 function isMax(p: player):: boolean:
 	set {_uuid} to {_p}'s uuid
@@ -55,7 +41,7 @@ function isMin(p: player):: boolean:
 function weaponMessage(p: player):: string:
 	set {_uuid} to {_p}'s uuid
 	if {weapon::%{_uuid}%} is "Sword":
-		return "&7&l⚔ ꜱᴡᴏʀᴅ"
+		return "&c&l⚔ ꜱᴡᴏʀᴅ"
 	if {weapon::%{_uuid}%} is "Axe":
 		return "&7&l🪓 ᴀxᴇ"
 	if {weapon::%{_uuid}%} is "Bow":
@@ -63,9 +49,9 @@ function weaponMessage(p: player):: string:
 	if {weapon::%{_uuid}%} is "Crossbow":
 		return "&7&l🩸 ᴄʀᴏꜱꜱʙᴏᴡ"
 	if {weapon::%{_uuid}%} is "Trident":
-		return "&7&l🔱 ᴛʀɪᴅᴇɴᴛ"
+		return "&b&l🔱 ᴛʀɪᴅᴇɴᴛ"
 	if {weapon::%{_uuid}%} is "Shield":
-		return "&7&l🛡 ꜱʜɪᴇʟᴅ"
+		return "&a&l🛡 ꜱʜɪᴇʟᴅ"
 
 function getItem(i: item):: string:
 	if {_i}'s lore contains "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ɢᴀɪɴ &a+1 &fꜱᴛᴇʀɴɢᴛʜ":
@@ -92,6 +78,29 @@ function getStrength(p: player):: string:
 function resetcooldown(p: player):
 	set cooldown "%getWeapon({_p})%" for {_p} to 0
 
+
+function Stun(entity: entity, n: number):
+	set {_loc} to location of {_entity}
+	loop ({_n} * 20) times:
+		if any:
+			abs(x coord of {_entity} - x coord of {_loc}) > 0.005
+			abs(y coord of {_entity} - y coord of {_loc}) > 0.005
+			abs(z coord of {_entity} - z coord of {_loc}) > 0.005
+		then:
+			set yaw of {_loc} to yaw of {_entity}
+			set pitch of {_loc} to pitch of {_entity}
+			teleport {_entity} to {_loc}
+		wait 1 tick
+
+function partCircle(e: entity, radius: number, height: number):
+	set {_spacing} to 0.3
+	set {_circumference} to 2 * pi * {_radius}
+	set {_numParticles} to floor({_circumference} / {_spacing})
+	loop {_numParticles} times:
+		set {_angle} to loop-value * 360 / {_numParticles}
+		set {_v} to spherical vector with radius {_radius}, yaw {_angle} and pitch 0
+		draw 1 of dust using dustOption(rgb(128, 128, 128), 1.3) at location {_height} meter above {_e} ~ {_v}
+
 function weaponPower(p: player):
 	set {_uuid} to {_p}'s uuid
 	if getWeapon({_p}) is "Sword":
@@ -109,8 +118,31 @@ function weaponPower(p: player):
 			delete {-strength::sword::activated::%{_uuid}%}
 			set {_p}'s offhand item to {_off}
 			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
+			wait 30 seconds
+			send "&7&lOff Cooldown" to {_p}
 		else:
 			send "&7&lNot Ready" to {_p}
+	if getWeapon({_p}) is "Axe":
+		if {-Ready::Axe::%{_uuid}%} is set:
+			delete {-Ready::Axe::%{_uuid}%}
+			set {-strength::axe::activated::%{_uuid}%} to true
+			wait 5 seconds
+			loop all entities:
+				loop-entity is not {_p}
+				if {-storeddmg::%loop-entity's uuid%::%{_uuid}%} is set:
+					damage loop-entity by {-storeddmg::%loop-entity's uuid%::%{_uuid}%}
+					partCircle(loop-entity,1,0)
+					partCircle(loop-entity,1,1)
+					partCircle(loop-entity,1,0.5)
+					partCircle(loop-entity,1,2)
+					partCircle(loop-entity,1,1.5)
+					delete {-storeddmg::%loop-entity's uuid%::%{_uuid}%}
+					delete {-strength::axe::activated::%{_uuid}%}
+					set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
+					wait 30 seconds
+					send "&7&lOff Cooldown" to {_p}
+
+
 
 function swordParticle(p: player):
 	set {_uuid} to {_p}'s uuid
@@ -121,6 +153,54 @@ function swordParticle(p: player):
 		else:
 			stop loop
 
+function hasWeapon(p: player):: boolean:
+	set {_uuid} to {_p}'s uuid
+	if getWeapon({_p}) is "Sword":
+		if any:
+			{_p}'s tool is wooden sword
+			{_p}'s tool is stone sword
+			{_p}'s tool is copper sword
+			{_p}'s tool is iron sword
+			{_p}'s tool is diamond sword
+			{_p}'s tool is netherite sword
+		then:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Axe":
+		if any:
+			{_p}'s tool is wooden axe
+			{_p}'s tool is stone axe
+			{_p}'s tool is copper axe
+			{_p}'s tool is iron axe
+			{_p}'s tool is diamond axe
+			{_p}'s tool is netherite axe
+		then:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Shield":
+		if {_p} has shield:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Bow":
+		if {_p} has bow:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Crossbow":
+		if {_p} has crossbow:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Trident":
+		if {_p}'s tool is trident:
+			return true
+		else:
+			return false
+
+
 command /off:
 	trigger:
 		weaponPower(player)
@@ -129,12 +209,18 @@ every 2 seconds:
 	loop all players:
 		if {-cooldown::%getWeapon(loop-player)%::%loop-player's uuid%} is set:
 			set cooldown "%getWeapon(loop-player)%" for loop-player to 0 seconds
+		loop all items in loop-player's inventory:
+			if loop-item is mace:
+				if loop-item is enchanted:
+					disenchant loop-item
 
 command /combo:
+	permission: op
 	trigger:
 		send "%{-combo::%player's uuid%}%" to player
 
 command /delcombo:
+	permission: op
 	trigger:
 		delete {-combo::%player's uuid%}
 		set cooldown "%getWeapon(player)%" for player to 10 seconds

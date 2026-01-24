@@ -19,7 +19,15 @@ command /cooldown [<text>]:
 command /ability:
 	aliases: /strengthsmp:ability
 	trigger:
-		
+		if hasWeapon(player) is true:
+			if {-Ready::%getWeapon(player)%::%player's uuid%} is set:
+				weaponPower(player)
+				send "&aSucess!" to player
+			else:
+				send "&cNot Ready!" to player
+		else:
+			send "&cYou must hold your weapon" to player
+
 
 command /strength [<text>] [<text>] [<text>] [<text>]:
 	aliases: /strength:strengthsmp
@@ -153,6 +161,15 @@ on tab complete for "/cooldown" or "/strengthsmp:cooldown":
 
 # [----------------------Some Config stuff-------------------]
 
+
+on swap hand items:
+	if {-strength::sword::activated::%player's uuid%} is set:
+		cancel event
+
+on inventory click:
+	if {-strength::sword::activated::%player's uuid%} is set:
+		if event-item is player's offhand item:
+			cancel event
 
 on crafter craft:
 	if recipe result is mace:
