@@ -124,7 +124,21 @@ on damage:
 			delete {-combo::%attacker's uuid%}
 		if {-combo::%attacker's uuid%} is not set:
 			set {-combo::%attacker's uuid%} to 0
-		
+	if getWeapon(attacker) is "Crossbow":
+		if damage cause is projectile:
+			cooldown "Crossbow" for attacker is ready
+			if {-strength::crossbow::activated::%attacker's uuid%} is not set:
+				{-Ready::Crossbow::%attacker's uuid%} is not set
+				if {-combo::%attacker's uuid%} is 7:
+					send "&c&l🎯 Ready" to attacker
+					delete {-combo::%attacker's uuid%}
+					play sound "entity.player.levelup" with pitch 2 at attacker
+					set {-Ready::Crossbow::%attacker's uuid%} to true
+				if {-combo::%attacker's uuid%} > 7:
+					delete {-combo::%attacker's uuid%}
+				
+
+
 on damage:
 	if {-strength::axe::activated::%attacker's uuid%} is set:
 		if {-storeddmg::%victim's uuid%::%attacker's uuid%} is not set:
@@ -172,6 +186,37 @@ on damage:
 			hasWeapon(attacker) is true
 			{-strength::trident::activated::%attacker's uuid%} is not set
 			strike lightning at victim's location
+
+on damage:
+	if getWeapon(attacker) is "Crossbow":
+		if damage cause is projectile:
+			if {-strength::crossbow::activated::%attacker's uuid%} is not set:
+				if {-combo::%attacker's uuid%} is not set:
+					set {-combo::%attacker's uuid%} to 0
+				if {-combo::%attacker's uuid%} is not 3:
+					add 1 to {-combo::%attacker's uuid%}
+				else:
+					if {-Ready::Crossbow::%attacker's uuid%} is not set:
+						add 1 to {-combo::%attacker's uuid%}
+					else:
+						delete {-combo::%attacker's uuid%}
+					add damage to damage
+					play sound "item.crossbow.shoot" with pitch 2 at attacker
+			else:
+				delete {-strength::crossbow::activated::%attacker's uuid%}
+				leash victim to attacker
+				play sound "item.trident.hit_ground" at attacker
+				play sound "entity.experience_orb.pickup" at attacker
+				set {-leash::%victim%} to true
+				push(attacker,victim)
+				wait 8 seconds
+				unleash victim
+				delete {-leash::%victim%}
+
+on unleash:
+	if {-leash::%event-entity%} is set:
+		if event-string = "distance":
+			cancel event
 
 
 on damage:

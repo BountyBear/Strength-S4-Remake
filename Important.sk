@@ -35,7 +35,7 @@ command /ability:
 				else:
 					send "&cNot Ready!" to player
 			else:
-				send "&cYoh must have a &aShield" to player
+				send "&cYoh must have a &a%getWeapon(player)%" to player
 
 command /strength [<text>] [<text>] [<text>] [<text>]:
 	aliases: /strength:strengthsmp

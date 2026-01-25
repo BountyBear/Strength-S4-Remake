@@ -47,7 +47,7 @@ function weaponMessage(p: player):: string:
 	if {weapon::%{_uuid}%} is "Bow":
 		return "&7&l🏹 ʙᴏᴡ"
 	if {weapon::%{_uuid}%} is "Crossbow":
-		return "&7&l🩸 ᴄʀᴏꜱꜱʙᴏᴡ"
+		return "&c&l🎯 ᴄʀᴏꜱꜱʙᴏᴡ"
 	if {weapon::%{_uuid}%} is "Trident":
 		return "&b&l🔱 ᴛʀɪᴅᴇɴᴛ"
 	if {weapon::%{_uuid}%} is "Shield":
@@ -158,7 +158,28 @@ function weaponPower(p: player):
 		delete {-strength::shield::activated::%{_uuid}%}
 		wait 60 seconds
 		send "&7&lOff Cooldown" to {_p}
+	if getWeapon({_p}) is "Crossbow":
+		if {-Ready::Crossbow::%{_uuid}%} is set:
+			delete {-Ready::Crossbow::%{_uuid}%}
+			{-strength::crossbow::activated::%{_uuid}%} is not set
+			set {-strength::crossbow::activated::%{_uuid}%} to true
+			send "&a&lActivated for 5s" to {_p}
+			wait 5 seconds
+			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
 
+
+
+
+function push(e1: entity, e2: entity):
+	loop (100* 10) times:
+		if {-leash::%{_e2}%} is set:
+			if {_e2} is not within 4 blocks of {_e1}:
+				set {_v} to vector between {_e2} and {_e1}
+				push {_e2} {_v} with speed 0.1
+				make {_e2} ride {_e2} 
+				wait 1 tick
+		else:
+			stop loop
 
 function shieldBubble(p: player):
 	set {_uuid} to {_p}'s uuid
