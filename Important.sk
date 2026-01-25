@@ -33,7 +33,7 @@ command /ability:
 				if cooldown "%getWeapon(player)%" for player is ready:
 					weaponPower(player)
 				else:
-					send "&cNot Ready!" to player
+					send "&eYour ability is on cooldow" to player
 			else:
 				send "&cYoh must have a &a%getWeapon(player)%" to player
 
@@ -189,9 +189,13 @@ on craft:
 			cancel event
 		else:
 			stop
+on damage:
+	attacker's tool is mace
+	if item cooldown of mace for attacker is not 0 ticks:
+		cancel event
 
 on damage:
 	if attacker's tool is mace:
 		if hit is critical:
 			victim is not blocking
-			set item cooldown of mace for attacker to {-mace.cooldown}
+			set item cooldown of mace for attacker to 30 seconds

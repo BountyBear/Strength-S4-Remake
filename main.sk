@@ -177,7 +177,7 @@ on damage:
 				else:
 					delete {-combo::%attacker's uuid%}
 				wait 10 ticks
-				Stun(victim, 1)
+				Stun(victim, {-axe.stun})
 				partCircle(victim,1,0)
 				partCircle(victim,1,1)
 				partCircle(victim,1,2)

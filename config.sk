@@ -13,5 +13,5 @@ on load:
 	set {-axe.stun} to 1 # In Seconds <------
 	# Enable / Disable Mace
 	set {-mace.allow} to true 
-	# Mace Cooldown
-	set {-mace.cooldown} to 30 # In Seconds <-----
+	# enable action bar
+	set {-actionbar} to false

@@ -166,8 +166,53 @@ function weaponPower(p: player):
 			send "&a&lActivated for 5s" to {_p}
 			wait 5 seconds
 			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
+	if getWeapon({_p}) is "Trident":
+		if {-Ready::Trident::%{_uuid}%} is set:
+			delete {-Ready::Trident::%{_uuid}%}
+			{-strength::Trident::activated::%{_uuid}%} is not set
+			set {-strength::Trident::activated::%{_uuid}%} to true
+			loop (8 * 20) times:
+				set {_l1} to location 3 blocks infront of {_p}
+				set {_l2} to location 1 block above {_p}
+				tridentSwim({_p}, {_l2})
+				tridentSwim({_p}, {_l1})
+				wait 1 tick
+			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
+			delete {-strength::Trident::activated::%{_uuid}%}
 
+on damage:
+	if getWeapon(victim) is "Trident":
+		damage cause is lightning
+		cancel event
 
+function tridentSwim(p: player, lo: location):
+	set {_uuid} to {_p}'s uuid
+	loop all entities within 7 blocks of {_p}:
+		pull({_p}, loop-entity)
+		if {_p} is in water:
+			push {_p} forward at speed 0.05
+	loop all blocks in radius 1 of {_p}:
+		{-strength::Trident::activated::%{_uuid}%} is set
+		if loop-block is air:
+			set loop-block to water
+			wait 10 ticks
+			set loop-block to air
+			set {_l} to loop-block's location
+			loop all blocks in radius 3 of {_l}:
+				loop-block-2 is water
+				set loop-block-2 to air
+			
+
+function pull(e1: entity, e2: entity):
+	set {_uuid} to {_e1}'s uuid
+	loop (100* 10) times:
+		if {-strength::Trident::activated::%{_uuid}%} is set:
+			if {_e2} is not within 4 blocks of {_e1}:
+				set {_v} to vector between {_e2} and {_e1}
+				push {_e2} {_v} with speed 0.9
+				wait 1 tick
+		else:
+			stop loop
 
 
 function push(e1: entity, e2: entity):
@@ -271,6 +316,7 @@ command /delcombo:
 		delete {-combo::%player's uuid%}
 		set cooldown "%getWeapon(player)%" for player to 10 seconds
 
-every 5 ticks:
+every 10 ticks:
 	loop all players:
-		send action bar cooldown "%getWeapon(loop-player)%" for loop-player to loop-player
+		if {-actionbar} is true:
+			send action bar cooldown "%getWeapon(loop-player)%" for loop-player to loop-player

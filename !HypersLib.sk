@@ -185,15 +185,15 @@ function getActionBarCooldown(cooldow: text, show_decimal: boolean = false) :: t
 		
 		if {_cooldown_minutes} > 0:
 			if {_cooldown_seconds} < 1:
-				set {_cooldown} to "&7&l%{_cooldown_minutes}%m"
+				set {_cooldown} to "&c&l%{_cooldown_minutes}%m"
 			else:
-				set {_cooldown} to "&7&l%{_cooldown_minutes}%m %{_cooldown_seconds}%s"
+				set {_cooldown} to "&c&l%{_cooldown_minutes}%m %{_cooldown_seconds}%s"
 		if {_cooldown_minutes} < 1:
 			if {_cooldown_seconds} > 0:
-				set {_cooldown} to "&7&l%{_cooldown_seconds}%s"
+				set {_cooldown} to "&c&l%{_cooldown_seconds}%s"
 
 		if {_cooldown} is not set:
-			set {_cooldown} to "&7&lReady!"
+			set {_cooldown} to "&4&lReady!"
 
 		if {_show_decimal} is true:
 			replace all "m" and "s" with "" in {_cooldown}
