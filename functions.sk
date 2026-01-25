@@ -3,9 +3,9 @@
 function Assign(t: text,p: player):
 	set {_uuid} to {_p}'s uuid
 	if {_t} is "strength" or "Strength":
-		set {strength::%{_uuid}%} to {-strength::default}
+		set {strength::%{_uuid}%} to {-strength.default}
 	if {_t} is "Weapon" or "weapon":
-		set {_random} to random number between 1 and 6
+		set {_random} to 1 random integers between 1 and 6
 		if {_random} is 1:
 			set {weapon::%{_uuid}%} to "Sword"
 		if {_random} is 2:
@@ -20,26 +20,19 @@ function Assign(t: text,p: player):
 			set {weapon::%{_uuid}%} to "Shield"
 		send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ᴡᴇᴀᴘᴏɴ ɪꜱ %getWeapon({_p})%" to {_p}
 
-function isAssigned(p: player):: boolean:
-	set {_uuid} to {_p}'s uuid
-	if any:
-		{strength::%{_uuid}%} is not set
-		{weapon::%{_uuid}%} is not set
-	then:
-		return false
-	else:
-		if {weapon::%{_uuid}%} is not set:
-			return false
-		else if {strength::%{_uuid}%} is not set:
-			return false
-		else:
-			return true
 
 function isMax(p: player):: boolean:
 	set {_uuid} to {_p}'s uuid
-	set {_s} to {-strength::max}
+	set {_s} to {-strength.max}
 	remove 1 from {_s}
 	if {strength::%{_uuid}%} <= {_s}:
+		return false
+	else:
+		return true
+
+function isMin(p: player):: boolean:
+	set {_uuid} to {_p}'s uuid
+	if {strength::%{_uuid}%} > {-strength.min}:
 		return false
 	else:
 		return true
@@ -48,29 +41,282 @@ function isMax(p: player):: boolean:
 function weaponMessage(p: player):: string:
 	set {_uuid} to {_p}'s uuid
 	if {weapon::%{_uuid}%} is "Sword":
-		return "&4&lꜱᴡᴏʀᴅ"
+		return "&c&l⚔ ꜱᴡᴏʀᴅ"
 	if {weapon::%{_uuid}%} is "Axe":
-		return "&4&ᴀxᴇ"
+		return "&7&l🪓 ᴀxᴇ"
 	if {weapon::%{_uuid}%} is "Bow":
-		return "&4&lʙᴏᴡ"
+		return "&7&l🏹 ʙᴏᴡ"
 	if {weapon::%{_uuid}%} is "Crossbow":
-		return "&4&lᴄʀᴏꜱꜱʙᴏᴡ"
+		return "&c&l🎯 ᴄʀᴏꜱꜱʙᴏᴡ"
 	if {weapon::%{_uuid}%} is "Trident":
-		return "&4&lᴛʀɪᴅᴇɴᴛ"
+		return "&b&l🔱 ᴛʀɪᴅᴇɴᴛ"
 	if {weapon::%{_uuid}%} is "Shield":
-		return "&4&lꜱʜɪᴇʟᴅ"
+		return "&a&l🛡 ꜱʜɪᴇʟᴅ"
+
+function getItem(i: item):: string:
+	if {_i}'s lore contains "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ɢᴀɪɴ &a+1 &fꜱᴛᴇʀɴɢᴛʜ":
+		return "Strength"
+	if {_i}'s lore contains "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴡᴇᴀᴘᴏɴ":
+		return "Reroll"
+
 
 function strengthMessage(p: player):: string:
 	set {_uuid} to {_p}'s uuid
-	if {strength::{_uuid}} => 0:
-		return "&a&l+%{strength::{_uuid}}%"
+	if {strength::%{_uuid}%} >= 0:
+		return "&a&l+%{strength::%{_uuid}%}%"
 	else:
-		return "&a&l-%{strength::{_uuid}}%"
+		return "&c&l%{strength::%{_uuid}%}%"
 
 function getWeapon(p: player):: string:
 	set {_uuid} to {_p}'s uuid
-	return "%{weapon::{_uuid}}%"
+	return "%{weapon::%{_uuid}%}%"
 
 function getStrength(p: player):: string:
 	set {_uuid} to {_p}'s uuid
-	return "%{strength::{_uuid}}%"
+	return "%{strength::%{_uuid}%}%"
+
+function resetcooldown(p: player):
+	set cooldown "%getWeapon({_p})%" for {_p} to 0
+
+
+function Stun(entity: entity, n: number):
+	set {_loc} to location of {_entity}
+	loop ({_n} * 20) times:
+		if any:
+			abs(x coord of {_entity} - x coord of {_loc}) > 0.005
+			abs(y coord of {_entity} - y coord of {_loc}) > 0.005
+			abs(z coord of {_entity} - z coord of {_loc}) > 0.005
+		then:
+			set yaw of {_loc} to yaw of {_entity}
+			set pitch of {_loc} to pitch of {_entity}
+			teleport {_entity} to {_loc}
+		wait 1 tick
+
+function partCircle(e: entity, radius: number, height: number):
+	set {_spacing} to 0.3
+	set {_circumference} to 2 * pi * {_radius}
+	set {_numParticles} to floor({_circumference} / {_spacing})
+	loop {_numParticles} times:
+		set {_angle} to loop-value * 360 / {_numParticles}
+		set {_v} to spherical vector with radius {_radius}, yaw {_angle} and pitch 0
+		draw 1 of dust using dustOption(rgb(128, 128, 128), 1.3) at location {_height} meter above {_e} ~ {_v}
+
+function weaponPower(p: player):
+	set {_uuid} to {_p}'s uuid
+	if getWeapon({_p}) is "Sword":
+		if {-Ready::Sword::%{_uuid}%} is set:
+			delete {-Ready::Sword::%{_uuid}%}
+			set {_off} to {_p}'s offhand item
+			set {_held} to {_p}'s held item
+			set {-strength::sword::activated::%{_uuid}%} to true
+			set {_p}'s offhand item to {_held}
+			execute console command "attribute %{_p}% minecraft:attack_speed base set 6"
+			swordParticle({_p})
+			wait 15 seconds
+			execute console command "attribute %{_p}% minecraft:attack_speed base set 4"
+			play sound "block.chain.place" with volume 3 at {_p}
+			delete {-strength::sword::activated::%{_uuid}%}
+			set {_p}'s offhand item to {_off}
+			set cooldown "%getWeapon({_p})%" for {_p} to 45 seconds
+			wait 45 seconds
+			send "&7&lOff Cooldown" to {_p}
+		else:
+			send "&7&lNot Ready" to {_p}
+	if getWeapon({_p}) is "Axe":
+		if {-Ready::Axe::%{_uuid}%} is set:
+			delete {-Ready::Axe::%{_uuid}%}
+			set {-strength::axe::activated::%{_uuid}%} to true
+			wait 5 seconds
+			loop all entities:
+				loop-entity is not {_p}
+				if {-storeddmg::%loop-entity's uuid%::%{_uuid}%} is set:
+					damage loop-entity by {-storeddmg::%loop-entity's uuid%::%{_uuid}%}
+					partCircle(loop-entity,1,0)
+					partCircle(loop-entity,1,1)
+					partCircle(loop-entity,1,0.5)
+					partCircle(loop-entity,1,2)
+					partCircle(loop-entity,1,1.5)
+					delete {-storeddmg::%loop-entity's uuid%::%{_uuid}%}
+					delete {-strength::axe::activated::%{_uuid}%}
+					set cooldown "%getWeapon({_p})%" for {_p} to 45 seconds
+					wait 45 seconds
+					send "&7&lOff Cooldown" to {_p}
+	if getWeapon({_p}) is "Shield":
+		{-strength::shield::activated::%{_uuid}%} is not set
+		spawn armor stand at {_p}'s location
+		set {-bubble.%{_uuid}%} to last spawned armor stand
+		set {_u} to last spawned armor stand's uuid
+		set gravity of {-bubble.%{_uuid}%} to off
+		set visibility of {-bubble.%{_uuid}%} to false
+		set helmet of {-bubble.%{_uuid}%} to nautilus shell with custom model data 12346
+		set {-strength::shield::activated::%{_uuid}%} to true
+		execute console command "/attribute %{_u}% minecraft:scale base set 1.5"
+		shieldBubble({_p})
+		wait 15 seconds
+		kill last spawned armor stand
+		set cooldown "%getWeapon({_p})%" for {_p} to 60 seconds
+		delete {-strength::shield::activated::%{_uuid}%}
+		wait 60 seconds
+		send "&7&lOff Cooldown" to {_p}
+	if getWeapon({_p}) is "Crossbow":
+		if {-Ready::Crossbow::%{_uuid}%} is set:
+			delete {-Ready::Crossbow::%{_uuid}%}
+			{-strength::crossbow::activated::%{_uuid}%} is not set
+			set {-strength::crossbow::activated::%{_uuid}%} to true
+			send "&a&lActivated for 5s" to {_p}
+			wait 5 seconds
+			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
+	if getWeapon({_p}) is "Trident":
+		if {-Ready::Trident::%{_uuid}%} is set:
+			delete {-Ready::Trident::%{_uuid}%}
+			{-strength::Trident::activated::%{_uuid}%} is not set
+			set {-strength::Trident::activated::%{_uuid}%} to true
+			loop (8 * 20) times:
+				set {_l1} to location 3 blocks infront of {_p}
+				set {_l2} to location 1 block above {_p}
+				tridentSwim({_p}, {_l2})
+				tridentSwim({_p}, {_l1})
+				wait 1 tick
+			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
+			delete {-strength::Trident::activated::%{_uuid}%}
+
+on damage:
+	if getWeapon(victim) is "Trident":
+		damage cause is lightning
+		cancel event
+
+function tridentSwim(p: player, lo: location):
+	set {_uuid} to {_p}'s uuid
+	loop all entities within 7 blocks of {_p}:
+		pull({_p}, loop-entity)
+		if {_p} is in water:
+			push {_p} forward at speed 0.05
+	loop all blocks in radius 1 of {_p}:
+		{-strength::Trident::activated::%{_uuid}%} is set
+		if loop-block is air:
+			set loop-block to water
+			wait 10 ticks
+			set loop-block to air
+			set {_l} to loop-block's location
+			loop all blocks in radius 3 of {_l}:
+				loop-block-2 is water
+				set loop-block-2 to air
+			
+
+function pull(e1: entity, e2: entity):
+	set {_uuid} to {_e1}'s uuid
+	loop (100* 10) times:
+		if {-strength::Trident::activated::%{_uuid}%} is set:
+			if {_e2} is not within 4 blocks of {_e1}:
+				set {_v} to vector between {_e2} and {_e1}
+				push {_e2} {_v} with speed 0.9
+				wait 1 tick
+		else:
+			stop loop
+
+
+function push(e1: entity, e2: entity):
+	loop (100* 10) times:
+		if {-leash::%{_e2}%} is set:
+			if {_e2} is not within 4 blocks of {_e1}:
+				set {_v} to vector between {_e2} and {_e1}
+				push {_e2} {_v} with speed 0.1
+				make {_e2} ride {_e2} 
+				wait 1 tick
+		else:
+			stop loop
+
+function shieldBubble(p: player):
+	set {_uuid} to {_p}'s uuid
+	loop (300* 20) times:
+		if {-strength::shield::activated::%{_uuid}%} is true:
+			teleport {-bubble.%{_uuid}%} at location 0.8 blocks below {_p}
+			wait 1 tick if mod(loop-iteration, 3) is 0
+		else:
+			stop loop
+
+function swordParticle(p: player):
+	set {_uuid} to {_p}'s uuid
+	loop (100* 20) times:
+		if {-strength::sword::activated::%{_uuid}%} is true:
+			draw 2 of dust using dustOption(rgb(255, 0, 0), 1) at location 1 block above {_p} with offset vector(0.4,0.4,0.4)
+			wait 1 tick if mod(loop-iteration, 2) is 0
+		else:
+			stop loop
+
+function hasWeapon(p: player):: boolean:
+	set {_uuid} to {_p}'s uuid
+	if getWeapon({_p}) is "Sword":
+		if any:
+			{_p}'s tool is wooden sword
+			{_p}'s tool is stone sword
+			{_p}'s tool is copper sword
+			{_p}'s tool is iron sword
+			{_p}'s tool is diamond sword
+			{_p}'s tool is netherite sword
+		then:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Axe":
+		if any:
+			{_p}'s tool is wooden axe
+			{_p}'s tool is stone axe
+			{_p}'s tool is copper axe
+			{_p}'s tool is iron axe
+			{_p}'s tool is diamond axe
+			{_p}'s tool is netherite axe
+		then:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Shield":
+		if {_p} has shield:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Bow":
+		if {_p} has bow:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Crossbow":
+		if {_p} has crossbow:
+			return true
+		else:
+			return false
+	if getWeapon({_p}) is "Trident":
+		if {_p}'s tool is trident:
+			return true
+		else:
+			return false
+
+
+command /off:
+	trigger:
+		weaponPower(player)
+
+every 2 seconds:
+	loop all players:
+		if {-cooldown::%getWeapon(loop-player)%::%loop-player's uuid%} is set:
+			set cooldown "%getWeapon(loop-player)%" for loop-player to 0 seconds
+		loop all items in loop-player's inventory:
+			if loop-item is mace:
+				if loop-item is enchanted:
+					disenchant loop-item
+
+command /combo:
+	permission: op
+	trigger:
+		send "%{-combo::%player's uuid%}%" to player
+
+command /delcombo:
+	permission: op
+	trigger:
+		delete {-combo::%player's uuid%}
+		set cooldown "%getWeapon(player)%" for player to 10 seconds
+
+every 10 ticks:
+	loop all players:
+		if {-actionbar} is true:
+			send action bar cooldown "%getWeapon(loop-player)%" for loop-player to loop-player

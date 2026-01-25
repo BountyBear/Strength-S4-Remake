@@ -6,27 +6,224 @@
 #-----------------------[Strength System]----------------------
 
 on load:
-	set {-strength::bottle} to nautlis shell named "&cStrength" with custom model data 12345
-	set {-strength::reroll} to book named "&aReroll" with lore "&aRandom Ultimate and Basic" with custome model data 12346
+	set {-strength::bottle} to nautilus shell named "&4ꜱᴛʀᴇɴɢᴛʜ" with lore "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ɢᴀɪɴ &a+1 &fꜱᴛᴇʀɴɢᴛʜ" with custom model data 12345
+	set {-strength::reroll} to book named "&4ʀᴇʀᴏʟʟ ʙᴏᴏᴋ" with lore "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴡᴇᴀᴘᴏɴ" with custom model data 12346
+	set {-bubble} to nautilus shell with custom model data 12346
+	set {-beam} to nautilus shell with custom model data 12347
 
 on join:
-	if isAssigned({_p}) is false:
+	if {strength::%player's uuid%} or {weapon::%player's uuid%} is not set:
 		set {_s} to "Strength"
 		set {_w} to "Weapon"
 		Assign({_s}, player)
 		Assign({_w}, player)
+	delete {-auto.crit::%player's uuid%}
+	delete {-combo::%player's uuid%}
+	delete {-Ready::%getWeapon(player)%::%player's uuid%}
+	delete {-strength::%getWeapon(player)%::activated::%player's uuid%}
 
 on death of player:
-	if getStrength(victim) > {-strength::minimum}:
+	if isMin(victim) is false:
 		remove 1 from {strength::%victim's uuid%}
-		if attacker is not a player:
-			drop 1 of {-strength::bottle} at victim's location
+		if attacker is not player:
+			drop 1 of {-strength::bottle} at victim
 		else:
 			if isMax(attacker) is false:
 				add 1 to {strength::%attacker's uuid%}
-				set {_m2} to getStrength(attacker)
-				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%)"
+				set {_m2} to strengthMessage(attacker)
+				send "&4&lʏᴏᴜʀ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ɪɴᴄʀᴇᴀꜱᴇᴅ ᴛᴏ (%{_m2}%&4&l)" to attacker
 			else:
-				drop 1 of {-strength::bottle} at victim's location
+				drop 1 of {-strength::bottle} at victim
 		set {_m1} to strengthMessage(victim)
-		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%)"
+		send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)" to victim
+
+# [------------Strength and Reroll------------------]
+
+on damage:
+	if {strength::%attacker's uuid%} > 0:
+		set {_d} to {strength::%attacker's uuid%}
+		add {_d} to damage
+
+on right click:
+	if getItem(player's held item) is "Strength":
+		set {_i} to player's held item
+		if isMax(player) is false:
+			add 1 to {strength::%player's uuid%}
+			set {_m1} to strengthMessage(player)
+			send "&4&lʏᴏᴜʀ ɴᴇᴡ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ (%{_m1}%&4&l)" to player
+			play sound "entity.player.levelup" at player
+			remove 1 of {_i} from player's inventory
+		else:
+			send "&cYou are already at max strength (+5)" to player
+			play sound "block.note_block.bass" with volume 2 at player
+	if getItem(player's held item) is "Reroll":
+		set {_i} to player's held item
+		set {_w} to "Weapon"
+		Assign({_w}, player)
+		play sound "entity.player.levelup" at player
+		remove 1 of {_i} from player's inventory
+
+# [------------Weapons---------------]
+
+on damage:
+	{-strength::sword::activated::%attacker's uuid%} or {-auto.crit::%attacker's uuid%} is set
+	set damage to damage * 1.5
+	play sound "entity.player.attack.crit" with volume 3 at attacker's location
+	draw 10 of crit at victim's location with offset vector(1.2,1.3,1.2) with extra 0.3
+
+on damage:
+	if getWeapon(victim) is "Sword":
+		{-strength::sword::activated::%victim's uuid%} or {-auto.crit::%victim's uuid%} is not set
+		{strength::%victim's uuid%} > -1
+		delete {-combo::%victim's uuid%}
+	if getWeapon(victim) is "Axe":
+		{-strength::axe::activated::%victim's uuid%} is not set
+		{strength::%victim's uuid%} > -1
+		delete {-combo::%victim's uuid%}
+
+on damage:
+	attacker is player
+	{strength::%attacker's uuid%} = 5
+	if getWeapon(attacker) is "Sword":
+		hasWeapon(attacker) is true
+		cooldown "Sword" for attacker is ready
+		{-Ready::Sword::%attacker's uuid%} is not set
+		{-strength::sword::activated::%attacker's uuid%} is not set
+		if {-combo::%attacker's uuid%} is not 5:
+			add 1 to {-combo::%attacker's uuid%}
+		else:
+			send "&7&l⚔ Ready" to attacker
+			play sound "entity.player.levelup" with pitch 2 at attacker
+			set {-Ready::Sword::%attacker's uuid%} to true
+			delete {-combo::%attacker's uuid%}
+		if {-combo::%attacker's uuid%} is not set:
+			set {-combo::%attacker's uuid%} to 0
+	if getWeapon(attacker) is "Axe":
+		hasWeapon(attacker) is true
+		cooldown "Axe" for attacker is ready
+		{-Ready::Axe::%attacker's uuid%} is not set
+		{-strength::Axe::activated::%attacker's uuid%} is not set
+		if {-combo::%attacker's uuid%} is 7:
+			send "&7&l🪓 Ready" to attacker
+			play sound "entity.player.levelup" with pitch 2 at attacker
+			set {-Ready::Axe::%attacker's uuid%} to true
+			delete {-combo::%attacker's uuid%}
+		if {-combo::%attacker's uuid%} is not set:
+			set {-combo::%attacker's uuid%} to 0
+	if getWeapon(attacker) is "Trident":
+		hasWeapon(attacker) is true
+		cooldown "Trident" for attacker is ready
+		{-Ready::trident::%attacker's uuid%} is not set
+		{-strength::trident::activated::%attacker's uuid%} is not set
+		if {-combo::%attacker's uuid%} is not 5:
+			add 1 to {-combo::%attacker's uuid%}
+		else:
+			send "&b&l🔱 Ready" to attacker
+			play sound "entity.player.levelup" with pitch 2 at attacker
+			set {-Ready::trident::%attacker's uuid%} to true
+			delete {-combo::%attacker's uuid%}
+		if {-combo::%attacker's uuid%} is not set:
+			set {-combo::%attacker's uuid%} to 0
+	if getWeapon(attacker) is "Crossbow":
+		if damage cause is projectile:
+			cooldown "Crossbow" for attacker is ready
+			if {-strength::crossbow::activated::%attacker's uuid%} is not set:
+				{-Ready::Crossbow::%attacker's uuid%} is not set
+				if {-combo::%attacker's uuid%} is 7:
+					send "&c&l🎯 Ready" to attacker
+					delete {-combo::%attacker's uuid%}
+					play sound "entity.player.levelup" with pitch 2 at attacker
+					set {-Ready::Crossbow::%attacker's uuid%} to true
+				if {-combo::%attacker's uuid%} > 7:
+					delete {-combo::%attacker's uuid%}
+				
+
+
+on damage:
+	if {-strength::axe::activated::%attacker's uuid%} is set:
+		if {-storeddmg::%victim's uuid%::%attacker's uuid%} is not set:
+			set {-storeddmg::%victim's uuid%::%attacker's uuid%} to damage
+			set damage to 0
+		else:
+			add damage to {-storeddmg::%victim's uuid%::%attacker's uuid%}
+			set damage to 0
+
+on damage:
+	if attacker is player:
+		{strength::%attacker's uuid%} > -1
+		if getWeapon(attacker) is "Sword":
+			hasWeapon(attacker) is true
+			{-strength::sword::activated::%attacker's uuid%} is not set
+			{-auto.crit::%attacker's uuid%} is not set
+			if {-combo::%attacker's uuid%} is not set:
+				set {-combo::%attacker's uuid%} to 0
+			if {-combo::%attacker's uuid%} is not 3:
+				add 1 to {-combo::%attacker's uuid%}
+			else:
+				set {-combo::%attacker's uuid%} to 0
+				set {-auto.crit::%attacker's uuid%} to true
+				wait 5 seconds
+				delete {-auto.crit::%attacker's uuid%}
+		if getWeapon(attacker) is "Axe":
+			hasWeapon(attacker) is true
+			{-strength::axe::activated::%attacker's uuid%} is not set
+			if {-combo::%attacker's uuid%} is not set:
+				set {-combo::%attacker's uuid%} to 0
+			if {-combo::%attacker's uuid%} is not 5:
+				add 1 to {-combo::%attacker's uuid%}
+			else:
+				if {-Ready::Axe::%attacker's uuid%} is not set:
+					add 1 to {-combo::%attacker's uuid%}
+				else:
+					delete {-combo::%attacker's uuid%}
+				wait 10 ticks
+				Stun(victim, {-axe.stun})
+				partCircle(victim,1,0)
+				partCircle(victim,1,1)
+				partCircle(victim,1,2)
+				play sound "entity.elder_guardian.curse" with pitch 2 at victim
+		if getWeapon(attacker) is "Trident":
+			hasWeapon(attacker) is true
+			{-strength::trident::activated::%attacker's uuid%} is not set
+			strike lightning at victim's location
+
+on damage:
+	if getWeapon(attacker) is "Crossbow":
+		if damage cause is projectile:
+			if {-strength::crossbow::activated::%attacker's uuid%} is not set:
+				if {-combo::%attacker's uuid%} is not set:
+					set {-combo::%attacker's uuid%} to 0
+				if {-combo::%attacker's uuid%} is not 3:
+					add 1 to {-combo::%attacker's uuid%}
+				else:
+					if {-Ready::Crossbow::%attacker's uuid%} is not set:
+						add 1 to {-combo::%attacker's uuid%}
+					else:
+						delete {-combo::%attacker's uuid%}
+					add damage to damage
+					play sound "item.crossbow.shoot" with pitch 2 at attacker
+			else:
+				delete {-strength::crossbow::activated::%attacker's uuid%}
+				leash victim to attacker
+				play sound "item.trident.hit_ground" at attacker
+				play sound "entity.experience_orb.pickup" at attacker
+				set {-leash::%victim%} to true
+				push(attacker,victim)
+				wait 8 seconds
+				unleash victim
+				delete {-leash::%victim%}
+
+on unleash:
+	if {-leash::%event-entity%} is set:
+		if event-string = "distance":
+			cancel event
+
+
+on damage:
+	getWeapon(victim) is "shield"
+	if item cooldown of shield for victim is not 0 ticks:
+		set damage to damage / 1.5
+
+on damage:
+	if {-strength::shield::activated::%victim's uuid%} is true:
+		cancel event

@@ -1,0 +1,201 @@
+# Some Imp stuff
+
+
+# [------------------Commands----------------------]
+
+command /cooldown [<text>]:
+	aliases: /strengthsmp:cooldown
+	permission: op
+	trigger:
+		if arg-1 is set:
+			set {_p} to arg-1 parsed as player
+			resetcooldown({_p})
+			send "&7Reset Cooldown for {_p}" to player
+		else:
+			resetcooldown(player)
+			send "&7Reset Cooldown for player" to player
+
+
+command /ability:
+	aliases: /strengthsmp:ability
+	trigger:
+		if getWeapon(player) is not "Shield":
+			if hasWeapon(player) is true:
+				if {-Ready::%getWeapon(player)%::%player's uuid%} is set:
+					weaponPower(player)
+					send "&aSucess!" to player
+				else:
+					send "&cNot Ready!" to player
+			else:
+				send "&cYou must hold your weapon" to player
+		else:
+			if hasWeapon(player) is true:
+				if cooldown "%getWeapon(player)%" for player is ready:
+					weaponPower(player)
+				else:
+					send "&eYour ability is on cooldow" to player
+			else:
+				send "&cYoh must have a &a%getWeapon(player)%" to player
+
+command /strength [<text>] [<text>] [<text>] [<text>]:
+	aliases: /strength:strengthsmp
+	trigger:
+		if arg-1 is not set:
+			send "&e&lStrength: %strengthMessage(player)%" to player
+			send "&e&lWeapon: %weaponMessage(player)%" to player
+		else:
+			if arg-1 is "Strength":
+				if arg-2 is not set:
+					send "&4&lʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ᴀᴛ %strengthMessage(player)%" to player
+				else:
+					if player has permission "op":
+						set {_p} to arg-2 parsed as player
+						send "&4&l%{_p}% ᴄᴜʀʀᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ᴀᴛ %strengthMessage({_p})%" to player
+					else:
+						send "You don't have operator" to player
+			if arg-1 is "Weapon":
+				if arg-2 is not set:
+					send "&4&lʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ᴡᴇᴀᴘᴏɴ ɪꜱ %weaponMessage(player)%" to player
+				else:
+					if player has permission "op":
+						set {_p} to arg-2 parsed as player
+						send "&4&l%{_p}% ᴄᴜʀʀᴇɴᴛ ᴡᴇᴀᴘᴏɴ ɪꜱ %weaponMessage({_p})%" to player
+					else:
+						send "You don't have operator" to player
+			if arg-1 is "Set":
+				player has permission "op"
+				if arg-2 is not set:
+					send "Invalid Argument :/" to player
+				else:
+					if arg-2 is "Strength":
+						if arg-3 is not set:
+							send "Invalid Argument :/" to player
+						else:
+							set {_p} to arg-3 parsed as player
+							set {_uuid} to {_p}'s uuid
+							if arg-4 is not set:
+								send "Invalid Argument :/" to player
+							else:
+								set {_i} to arg-4 parsed as integer
+								set {strength::%{_uuid}%} to {_i}
+								send "&4&lʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ᴀᴛ %strengthMessage({_p})%" to {_p}
+								send "&4&l%{_p}% ᴄᴜʀʀᴇɴᴛ ꜱᴛʀᴇɴɢᴛʜ ɪꜱ ᴀᴛ %strengthMessage({_p})%" to player
+					if arg-2 is "Weapon":
+						if arg-3 is not set:
+							send "Invalid Argument :/" to player
+						else:
+							set {_p} to arg-3 parsed as player
+							set {_uuid} to {_p}'s uuid
+							if arg-4 is not set:
+								send "Invalid Argument :/" to player
+							else:
+								set {_i} to arg-4
+								if {_i} is "Bow" or "Sword" or "Crossbow" or "Shield" or "Axe" or "Trident":
+									set {weapon::%{_uuid}%} to {_i}
+									send "&4&l%{_p}% ᴄᴜʀʀᴇɴᴛ ᴡᴇᴀᴘᴏɴ ɪꜱ %weaponMessage({_p})%" to player
+									send "&4&lʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ᴡᴇᴀᴘᴏɴ ɪꜱ %weaponMessage(player)%" to {_p}
+			if arg-1 is "Item":
+				player has permission "op"
+				if arg-2 is not set:
+					send "Invalid Argument :/" to player
+				else:
+					if arg-2 is "Strength":
+						if arg-3 is not set:
+							if player cannot hold 1 water bucket:
+								send "Free Inventory Space" to player
+							else:
+								give 1 of {-strength::bottle} to player
+								send "&cGiven Strength Item" to player
+						else:
+							set {_p} to arg-3 parsed as player
+							if arg-4 is not set:
+								if {_p} cannot hold 1 water bucket:
+									send "Free Inventory Space" to {_p}
+								else:
+									give 1 of {-strength::bottle} to {_p}
+									send "&cYou recieved strength item from &a%player%" to {_p}
+							else:
+								set {_i} to arg-4 parsed as number
+								loop {_i} times:
+									give 1 of {-strength::bottle} to {_p}
+								send "&cYou recieved %{_i}% strength item from &a%player%" to {_p}
+					if arg-2 is "Reroll":
+						if arg-3 is not set:
+							if player cannot hold 1 water bucket:
+								send "Free Inventory Space" to player
+							else:
+								give 1 of {-strength::reroll} to player
+								send "&cGiven Reroll Item" to player
+						else:
+							set {_p} to arg-3 parsed as player
+							if arg-4 is not set:
+								if {_p} cannot hold 1 water bucket:
+									send "Free Inventory Space" to {_p}
+								else:
+									give 1 of {-strength::reroll} to {_p}
+									send "&cYou recieved reroll item from &a%player%" to {_p}
+							else:
+								set {_i} to arg-4 parsed as number
+								loop {_i} times:
+									give 1 of {-strength::reroll} to {_p}
+								send "&cYou recieved %{_i}% reroll item from &a%player%" to {_p}
+
+
+on tab complete for "/strength" or "/strength:strengthsmp":
+	if player does not have permission "op":
+		set tab completions for position 1 to "Strength"  and "Weapon"
+	else:
+		set tab completions for position 1 to "Strength"  and "Weapon" and "Set" and "Item"
+		if tab arg-1 = "Strength":
+			set tab completions for position 2 to all players
+		if tab arg-1 = "Weapon":
+			set tab completions for position 2 to all players
+		if tab arg-1 = "Set":
+			set tab completions for position 2 to "Strength" and "Weapon"
+			if tab arg-2 = "Strength":
+				set tab completions for position 3 to all players
+				set tab completions for position 4 to -3,-2,-1,0,1,2,3,4,5
+			if tab arg-2 = "Weapon":
+				set tab completions for position 3 to all players
+				set tab completions for position 4 to "Sword" and "Axe" and "Shield" and "Bow" and "Crossbow" and "Trident"
+		if tab arg-1 = "Item":
+			set tab completions for position 2 to "Strength" and "Reroll"
+			set tab completions for position 3 to all players
+			set tab completions for position 4 to 1,2,3,4,5,6,7,8,9
+
+on tab complete for "/cooldown" or "/strengthsmp:cooldown":
+	player has permission "op"
+	set tab completions for position 1 to all players
+
+# [----------------------Some Config stuff-------------------]
+
+
+on swap hand items:
+	if {-strength::sword::activated::%player's uuid%} is set:
+		cancel event
+
+on inventory click:
+	if {-strength::sword::activated::%player's uuid%} is set:
+		if event-item is player's offhand item:
+			cancel event
+
+on crafter craft:
+	if recipe result is mace:
+		cancel event
+
+on craft:
+	if event-item is mace:
+		if {-mace.allow} is false:
+			cancel event
+		else:
+			stop
+on damage:
+	attacker's tool is mace
+	if item cooldown of mace for attacker is not 0 ticks:
+		cancel event
+
+on damage:
+	if attacker's tool is mace:
+		if hit is critical:
+			victim is not blocking
+			set item cooldown of mace for attacker to 30 seconds

@@ -2,16 +2,16 @@
 
 on load:
 	# Maximum Strength
-	set {-strength::max} to 5
+	set {-strength.max} to 5
 	# Minimum Strength
-	set {-strength::minimum} to -3
+	set {-strength.min} to -3
 	# Default Strength (On First Join)
-	set {-strength::default} to 0
+	set {-strength.default} to 0
 	# Enable/Disable Strength pots
-	set {-strength::pots} false
+	set {-strength.pots} to false
 	# Axe Weapon Stun Duration (In Seconds)
-	set {-strength::axe.stun} to 1 # In Seconds <------
+	set {-axe.stun} to 1 # In Seconds <------
 	# Enable / Disable Mace
-	set {-mace::allow} true 
-	# Mace Cooldown
-	set {-mace::cooldown} to 30 # In Seconds <-----
+	set {-mace.allow} to true 
+	# enable action bar
+	set {-actionbar} to false
