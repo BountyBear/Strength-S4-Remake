@@ -117,8 +117,8 @@ function weaponPower(p: player):
 			play sound "block.chain.place" with volume 3 at {_p}
 			delete {-strength::sword::activated::%{_uuid}%}
 			set {_p}'s offhand item to {_off}
-			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
-			wait 30 seconds
+			set cooldown "%getWeapon({_p})%" for {_p} to 45 seconds
+			wait 45 seconds
 			send "&7&lOff Cooldown" to {_p}
 		else:
 			send "&7&lNot Ready" to {_p}
@@ -138,11 +138,36 @@ function weaponPower(p: player):
 					partCircle(loop-entity,1,1.5)
 					delete {-storeddmg::%loop-entity's uuid%::%{_uuid}%}
 					delete {-strength::axe::activated::%{_uuid}%}
-					set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
-					wait 30 seconds
+					set cooldown "%getWeapon({_p})%" for {_p} to 45 seconds
+					wait 45 seconds
 					send "&7&lOff Cooldown" to {_p}
+	if getWeapon({_p}) is "Shield":
+		{-strength::shield::activated::%{_uuid}%} is not set
+		spawn armor stand at {_p}'s location
+		set {-bubble.%{_uuid}%} to last spawned armor stand
+		set {_u} to last spawned armor stand's uuid
+		set gravity of {-bubble.%{_uuid}%} to off
+		set visibility of {-bubble.%{_uuid}%} to false
+		set helmet of {-bubble.%{_uuid}%} to nautilus shell with custom model data 12346
+		set {-strength::shield::activated::%{_uuid}%} to true
+		execute console command "/attribute %{_u}% minecraft:scale base set 1.5"
+		shieldBubble({_p})
+		wait 15 seconds
+		kill last spawned armor stand
+		set cooldown "%getWeapon({_p})%" for {_p} to 60 seconds
+		delete {-strength::shield::activated::%{_uuid}%}
+		wait 60 seconds
+		send "&7&lOff Cooldown" to {_p}
 
 
+function shieldBubble(p: player):
+	set {_uuid} to {_p}'s uuid
+	loop (300* 20) times:
+		if {-strength::shield::activated::%{_uuid}%} is true:
+			teleport {-bubble.%{_uuid}%} at location 0.8 blocks below {_p}
+			wait 1 tick if mod(loop-iteration, 3) is 0
+		else:
+			stop loop
 
 function swordParticle(p: player):
 	set {_uuid} to {_p}'s uuid

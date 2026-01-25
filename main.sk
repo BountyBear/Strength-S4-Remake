@@ -8,6 +8,8 @@
 on load:
 	set {-strength::bottle} to nautilus shell named "&4ꜱᴛʀᴇɴɢᴛʜ" with lore "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ɢᴀɪɴ &a+1 &fꜱᴛᴇʀɴɢᴛʜ" with custom model data 12345
 	set {-strength::reroll} to book named "&4ʀᴇʀᴏʟʟ ʙᴏᴏᴋ" with lore "&fʀɪɢʜᴛ ᴄʟɪᴄᴋ ᴛᴏ ʀᴇʀᴏʟʟ ʏᴏᴜʀ ᴡᴇᴀᴘᴏɴ" with custom model data 12346
+	set {-bubble} to nautilus shell with custom model data 12346
+	set {-beam} to nautilus shell with custom model data 12347
 
 on join:
 	if {strength::%player's uuid%} or {weapon::%player's uuid%} is not set:
@@ -170,3 +172,13 @@ on damage:
 			hasWeapon(attacker) is true
 			{-strength::trident::activated::%attacker's uuid%} is not set
 			strike lightning at victim's location
+
+
+on damage:
+	getWeapon(victim) is "shield"
+	if item cooldown of shield for victim is not 0 ticks:
+		set damage to damage / 1.5
+
+on damage:
+	if {-strength::shield::activated::%victim's uuid%} is true:
+		cancel event
