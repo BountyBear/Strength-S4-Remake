@@ -143,17 +143,16 @@ function weaponPower(p: player):
 					send "&7&lOff Cooldown" to {_p}
 	if getWeapon({_p}) is "Shield":
 		{-strength::shield::activated::%{_uuid}%} is not set
-		spawn armor stand at {_p}'s location
-		set {-bubble.%{_uuid}%} to last spawned armor stand
-		set {_u} to last spawned armor stand's uuid
-		set gravity of {-bubble.%{_uuid}%} to off
-		set visibility of {-bubble.%{_uuid}%} to false
-		set helmet of {-bubble.%{_uuid}%} to nautilus shell with custom model data 12346
-		set {-strength::shield::activated::%{_uuid}%} to true
-		execute console command "/attribute %{_u}% minecraft:scale base set 1.5"
+		set {-strength::shield::activated::%{_uuid}%} to true 
+		spawn item display at {_p}'s location
+		set {_display} to  last spawned item display
+		set {-bubble.%{_uuid}%} to {_display}
+		set display scale of {_display} to vector(1.5,1.5,1.5)
+		set item of {_display} to nautilus shell with custom model data 12346
+		play sound "warden.sonic_boom" at {_p}
 		shieldBubble({_p})
 		wait 15 seconds
-		kill last spawned armor stand
+		kill {_display}
 		set cooldown "%getWeapon({_p})%" for {_p} to 60 seconds
 		delete {-strength::shield::activated::%{_uuid}%}
 		wait 60 seconds
@@ -179,6 +178,68 @@ function weaponPower(p: player):
 				wait 1 tick
 			set cooldown "%getWeapon({_p})%" for {_p} to 30 seconds
 			delete {-strength::Trident::activated::%{_uuid}%}
+	if getWeapon({_p}) is "Bow":
+		if {-Ready::bow::%{_uuid}%} is set:
+			delete {-Ready::bow::%{_uuid}%}
+			bowBeam({_p})
+			wait 1 second
+			set {_loc} to location 1.5 blocks above and 8 blocks infront of {_p}'s location
+			beamSpawn({_loc}, {_p})
+			wait 2 seconds
+			set {_loc} to location 1.5 blocks above and 8 blocks infront of {_p}'s location
+			beamSpawn({_loc}, {_p})
+			wait 1 second
+			set {_loc} to location 1.5 blocks above and 8 blocks infront of {_p}'s location
+			beamSpawn({_loc}, {_p})
+			set cooldown "%getWeapon({_p})%" for {_p} to 45 seconds			
+			wait 30 seconds
+			send "&7&lOff Cooldown" to {_p}
+
+
+function beamSpawn(loc: location, p: player):
+	spawn item display at {_loc}
+	set {_display} to  last spawned item display
+	set display scale of {_display} to vector(0.7,0.7,5)
+	set item of {_display} to nautilus shell with custom model data 12347
+	play sound "entity.warden.sonic_boom" at {_p}
+	beamDMG({_loc}, {_p})
+	wait 1 second
+	kill {_display}
+
+function beamDMG(loc: location, p: player):
+	loop 20 times:
+		set {_beamloc} to location {_add} metres in front of {_loc}
+		add 1 to {_add}
+		loop all entities within 3 blocks of {_beamloc}:
+			if {_dont::%loop-entity%} is not set:
+				set {_dont::%loop-entity%} to true
+				loop-entity is not {_p}
+				damage loop-entity by 4 hearts
+			else:
+				wait 10 ticks
+				delete {_dont::%loop-entity%}
+
+command /baam:
+	permission: op
+	trigger:
+		bowBeam(player)
+		wait 1 second
+		set {_loc} to location 1.5 blocks above and 8 blocks infront of player's location
+		beamSpawn({_loc}, player)
+		wait 2 seconds
+		set {_loc} to location 1.5 blocks above and 8 blocks infront of player's location
+		beamSpawn({_loc}, player)
+
+function bowBeam(p: player):
+	loop (5 * 20) times:
+		set {_loc} to location 1.5 blocks above {_p}'s location
+		set {_add} to 1
+		set {_beamloc} to {_loc}
+		wait 1 tick
+		loop 20 times:
+			set {_beamloc} to location {_add} metres in front of {_loc}
+			draw 2 of end_rod at {_beamloc} with extra 0.0000000001 with force
+			add 1 to {_add}
 
 on damage:
 	if getWeapon(victim) is "Trident":
@@ -230,8 +291,8 @@ function shieldBubble(p: player):
 	set {_uuid} to {_p}'s uuid
 	loop (300* 20) times:
 		if {-strength::shield::activated::%{_uuid}%} is true:
-			teleport {-bubble.%{_uuid}%} at location 0.8 blocks below {_p}
-			wait 1 tick if mod(loop-iteration, 3) is 0
+			teleport {-bubble.%{_uuid}%} at location 1 block above {_p}
+			wait 1 tick if mod(loop-iteration, 8) is 0
 		else:
 			stop loop
 
