@@ -92,7 +92,7 @@ on damage:
 		if {-combo::%attacker's uuid%} is not 5:
 			add 1 to {-combo::%attacker's uuid%}
 		else:
-			send "&7&l⚔ Ready" to attacker
+			send "&7&l⚔ Ready!" to attacker
 			play sound "entity.player.levelup" with pitch 2 at attacker
 			set {-Ready::Sword::%attacker's uuid%} to true
 			delete {-combo::%attacker's uuid%}
@@ -104,7 +104,7 @@ on damage:
 		{-Ready::Axe::%attacker's uuid%} is not set
 		{-strength::Axe::activated::%attacker's uuid%} is not set
 		if {-combo::%attacker's uuid%} is 7:
-			send "&7&l🪓 Ready" to attacker
+			send "&7&l🪓 Ready!" to attacker
 			play sound "entity.player.levelup" with pitch 2 at attacker
 			set {-Ready::Axe::%attacker's uuid%} to true
 			delete {-combo::%attacker's uuid%}
@@ -118,7 +118,7 @@ on damage:
 		if {-combo::%attacker's uuid%} is not 5:
 			add 1 to {-combo::%attacker's uuid%}
 		else:
-			send "&b&l🔱 Ready" to attacker
+			send "&b&l🔱 Ready!" to attacker
 			play sound "entity.player.levelup" with pitch 2 at attacker
 			set {-Ready::trident::%attacker's uuid%} to true
 			delete {-combo::%attacker's uuid%}
@@ -130,12 +130,22 @@ on damage:
 			if {-strength::crossbow::activated::%attacker's uuid%} is not set:
 				{-Ready::Crossbow::%attacker's uuid%} is not set
 				if {-combo::%attacker's uuid%} is 7:
-					send "&c&l🎯 Ready" to attacker
+					send "&c&l🎯 Ready!" to attacker
 					delete {-combo::%attacker's uuid%}
 					play sound "entity.player.levelup" with pitch 2 at attacker
 					set {-Ready::Crossbow::%attacker's uuid%} to true
 				if {-combo::%attacker's uuid%} > 7:
 					delete {-combo::%attacker's uuid%}
+	if getWeapon(attacker) is "Bow":
+		if damage cause is projectile:
+			cooldown "Bow" for attacker is ready
+			if {-strength::bow::activated::%attacker's uuid%} is not set:
+				{-Ready::bow::%attacker's uuid%} is not set
+				if {-combo::%attacker's uuid%} is 8:
+					send "&7&l🏹 Ready!" to attacker
+					delete {-combo::%attacker's uuid%}
+					play sound "entity.player.levelup" with pitch 2 at attacker
+					set {-Ready::bow::%attacker's uuid%} to true
 				
 
 
@@ -212,6 +222,22 @@ on damage:
 				wait 8 seconds
 				unleash victim
 				delete {-leash::%victim%}
+
+on damage:
+	if getWeapon(attacker) is "Bow":
+		if damage cause is projectile:
+			if {-strength::bow::activated::%attacker's uuid%} is not set:
+				if {-combo::%attacker's uuid%} is not set:
+					set {-combo::%attacker's uuid%} to 0
+				if {-combo::%attacker's uuid%} is not 5:
+					add 1 to {-combo::%attacker's uuid%}
+				else:
+					if {-Ready::bow::%attacker's uuid%} is not set:
+						add 1 to {-combo::%attacker's uuid%}
+					else:
+						delete {-combo::%attacker's uuid%}
+					add damage to damage
+
 
 on unleash:
 	if {-leash::%event-entity%} is set:
